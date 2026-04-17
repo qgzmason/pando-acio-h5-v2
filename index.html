@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pando - Buy Together, Save Money!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #333333;
+            --accent: #ff6b6b;
+            --success: #10b981;
+            --bg-main: #ffffff;
+            --bg-light: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border: #e5e5e5;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            padding-bottom: 70px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon span {
+            color: white;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            font-weight: 500;
+        }
+        .logo-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px;
+            color: var(--primary);
+            letter-spacing: 3px;
+        }
+
+        .header-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 0 16px;
+        }
+
+        .search-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .search-icon:hover {
+            color: var(--accent);
+        }
+
+        .search-box {
+            position: absolute;
+            top: 56px;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: none;
+            z-index: 999;
+        }
+
+        .search-box.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-selector {
+            position: relative;
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            border-radius: var(--radius-sm);
+        }
+
+        .lang-btn:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .lang-btn svg {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .lang-btn.active svg {
+            transform: rotate(180deg);
+        }
+
+        .lang-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: var(--transition);
+            min-width: 120px;
+        }
+
+        .lang-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .lang-option {
+            padding: 10px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .lang-option:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .lang-option.active {
+            color: var(--primary);
+            font-weight: 500;
+            background: var(--bg-light);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 56px;
+        }
+
+        .see-all {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 4px 10px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            transition: var(--transition);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .see-all:active {
+            background: var(--bg-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Banner */
+        .banner {
+            background: linear-gradient(135deg, #f3e7e9 0%, #e3eeff 100%);
+            padding: 32px 20px;
+            text-align: center;
+            position: relative;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .banner-content {
+            max-width: 500px;
+        }
+
+        .banner h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .banner p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .banner-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .banner-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-1px);
+        }
+
+        /* Section Common */
+        .section {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        /* Categories */
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            padding: 20px;
+            background: var(--bg-light);
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .category-name {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Promotional Section - Compact */
+        .promo-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 16px 20px;
+        }
+
+        .promo-card {
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .promo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .promo-card.left {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .promo-card.right {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .promo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .promo-text h3 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: white;
+        }
+
+        .promo-text .reward {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .promo-text .desc {
+            font-size: 10px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .promo-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            color: white;
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            align-self: flex-start;
+        }
+
+        .promo-btn:hover {
+            background: rgba(255,255,255,0.35);
+        }
+
+        /* Join Groups - Horizontal Scroll */
+        .join-groups {
+            overflow: hidden;
+        }
+
+        .join-groups-wrapper {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 12px;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+        }
+
+        .join-groups-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .join-groups-list {
+            display: flex;
+            gap: 12px;
+            padding: 0 20px;
+        }
+
+        .join-card {
+            flex: 0 0 170px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            scroll-snap-align: start;
+        }
+
+        .join-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .join-card-image {
+            position: relative;
+            width: 100%;
+            height: 130px;
+            overflow: hidden;
+        }
+
+        .join-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .compensation-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--success);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .join-card-body {
+            padding: 10px;
+        }
+
+        .join-card-title {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 36px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .join-card-prices {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .join-card-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .join-card-original {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .join-card-progress {
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-light);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .join-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .countdown {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'Inter', monospace;
+        }
+
+        .join-card-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .join-card-btn:hover {
+            background: var(--secondary);
+        }
+
+        /* Recommended Groups - 2 Column Grid */
+        .recommended-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 20px;
+        }
+
+        .recommended-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .recommended-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .recommended-card-image {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+        }
+
+        .recommended-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .recommended-card-body {
+            padding: 10px;
+        }
+
+        .recommended-card-title {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 34px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .recommended-card-prices {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .recommended-card-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .recommended-card-original {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .recommended-card-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .group-size {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .recommended-card .compensation-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            display: inline-block;
+            font-size: 11px;
+            padding: 4px 8px;
+            background: #c0392b !important;
+        }
+
+        .recommended-card-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .recommended-card-btn:hover {
+            background: var(--secondary);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            text-decoration: none;
+            color: var(--text-muted);
+            transition: var(--transition);
+            cursor: pointer;
+            padding: 8px 12px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .nav-item span {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .nav-item.active svg {
+            fill: var(--primary);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 2000;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Claim Modal */
+        .claim-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .claim-modal-overlay.active {
+            display: flex;
+        }
+
+        .claim-modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 320px;
+            padding: 32px 24px;
+            text-align: center;
+            position: relative;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .claim-modal .gift-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .claim-modal h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .claim-modal .reward-amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+
+        .claim-modal p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .claim-modal .claim-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+
+        .claim-modal .claim-btn:hover {
+            background: #059669;
+        }
+
+        .claim-modal .later-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .claim-modal .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--bg-light);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        /* Lucky Draw Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 340px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--bg-light);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .modal-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .modal-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .wheel-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                #ff6b6b 0deg 60deg,
+                #feca57 60deg 120deg,
+                #48dbfb 120deg 180deg,
+                #ff9ff3 180deg 240deg,
+                #54a0ff 240deg 300deg,
+                #5f27cd 300deg 360deg
+            );
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            position: relative;
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 20px solid var(--primary);
+            z-index: 10;
+        }
+
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .spin-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .spin-btn:hover:not(:disabled) {
+            background: var(--secondary);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result-display {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-display.show {
+            display: block;
+        }
+
+        .result-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .result-amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--success);
+            margin-top: 8px;
+        }
+
+        .spins-left {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 375px) {
+            .banner {
+                padding: 24px 16px;
+                min-height: 160px;
+            }
+            
+            .banner h1 {
+                font-size: 26px;
+            }
+            
+            .categories {
+                gap: 8px;
+            }
+            
+            .category-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+            
+            .category-name {
+                font-size: 10px;
+            }
+            
+            .join-card {
+                flex: 0 0 155px;
+            }
+
+            .recommended-list {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="index.html" class="logo">
+            <div class="logo-icon"><span>P</span></div>
+            <span class="logo-text">PANDO</span>
+        </a>
+        
+        <div class="header-center">
+            <svg class="search-icon" id="searchToggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+            </svg>
+        </div>
+        
+        <div class="header-right">
+            <div class="lang-selector">
+                <button class="lang-btn" id="langBtn">
+                    <span id="currentLang">EN</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                <div class="lang-dropdown" id="langDropdown">
+                    <div class="lang-option active" data-lang="EN">English</div>
+                    <div class="lang-option" data-lang="中文">中文</div>
+                    <div class="lang-option" data-lang="KH">ភាសាខ្មែរ</div>
+                    <div class="lang-option" data-lang="VI">Tiếng Việt</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Box -->
+    <div class="search-box" id="searchBox">
+        <input type="text" class="search-input" placeholder="Search products..." id="searchInput">
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Banner -->
+        <section class="banner" id="discover">
+            <div class="banner-content">
+                <h1>Buy together, save money!</h1>
+                <h1>Miss out, make money!</h1>
+                <p>Join group buys, win big. Don't win? Get paid anyway!</p>
+                <a href="discover.html" class="banner-btn">Learn How It Works</a>
+            </div>
+        </section>
+
+        <!-- Categories -->
+        <section class="categories">
+            <a href="categories.html?cat=Apparel" class="category-item">
+                <div class="category-icon">👕</div>
+                <span class="category-name">Apparel</span>
+            </a>
+            <a href="categories.html?cat=Beauty" class="category-item">
+                <div class="category-icon">💄</div>
+                <span class="category-name">Beauty</span>
+            </a>
+            <a href="categories.html?cat=Phones" class="category-item">
+                <div class="category-icon">📱</div>
+                <span class="category-name">Phones</span>
+            </a>
+            <a href="categories.html?cat=Digital" class="category-item">
+                <div class="category-icon">📷</div>
+                <span class="category-name">Digital</span>
+            </a>
+            <a href="categories.html?cat=Home" class="category-item">
+                <div class="category-icon">🏠</div>
+                <span class="category-name">Home</span>
+            </a>
+            <a href="categories.html?cat=Shoes" class="category-item">
+                <div class="category-icon">👟</div>
+                <span class="category-name">Shoes</span>
+            </a>
+            <a href="categories.html?cat=Baby" class="category-item">
+                <div class="category-icon">👶</div>
+                <span class="category-name">Baby</span>
+            </a>
+            <a href="categories.html?cat=Food" class="category-item">
+                <div class="category-icon">🍎</div>
+                <span class="category-name">Food</span>
+            </a>
+            <a href="categories.html?cat=Bags" class="category-item">
+                <div class="category-icon">👜</div>
+                <span class="category-name">Bags</span>
+            </a>
+            <a href="matching.html" class="category-item">
+                <div class="category-icon">🤝</div>
+                <span class="category-name">Connect</span>
+            </a>
+        </section>
+
+        <!-- Promotional Section -->
+        <section class="promo-section">
+            <div class="promo-card left" onclick="openClaimModal()">
+                <div class="promo-header">
+                    <div class="promo-text">
+                        <h3>New User Gift</h3>
+                        <div class="reward">$2.00</div>
+                    </div>
+                    <button class="promo-btn">Claim</button>
+                </div>
+                <div class="promo-text desc">Register & get bonus!</div>
+            </div>
+            <div class="promo-card right" onclick="openLuckyDraw()">
+                <div class="promo-header">
+                    <div class="promo-text">
+                        <h3>Lucky Draw</h3>
+                        <div class="reward">3 Free</div>
+                    </div>
+                    <button class="promo-btn">Play</button>
+                </div>
+                <div class="promo-text desc">Daily free spins!</div>
+            </div>
+        </section>
+
+        <!-- Join Groups -->
+        <section class="join-groups section">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h2 class="section-title" style="margin-bottom:0;">Join Groups</h2>
+                <a href="join-list.html" class="see-all">See All →</a>
+            </div>
+            <div class="join-groups-wrapper">
+                <div class="join-groups-list" id="joinGroupsList">
+                    <!-- Products will be injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Recommended Groups -->
+        <section class="recommended section">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h2 class="section-title" style="margin-bottom:0;">Recommended</h2>
+                <a href="start-list.html" class="see-all">See All →</a>
+            </div>
+            <div class="recommended-list" id="recommendedList">
+                <!-- Products will be injected by JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>Home</span>
+        </a>
+        <a href="categories.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            <span>Categories</span>
+        </a>
+        <a href="discover.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+            </svg>
+            <span>Discover</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <span>Orders</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span>Me</span>
+        </a>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Claim Modal -->
+    <div class="claim-modal-overlay" id="claimModal">
+        <div class="claim-modal">
+            <button class="close-btn" onclick="closeClaimModal()">×</button>
+            <div class="gift-icon">🎁</div>
+            <h2>Welcome Gift!</h2>
+            <div class="reward-amount">$2.00</div>
+            <p>Register now to claim your exclusive bonus!</p>
+            <button class="claim-btn" onclick="goToRegister()">Claim Now</button>
+            <button class="later-btn" onclick="closeClaimModal()">Maybe Later</button>
+        </div>
+    </div>
+
+    <!-- Lucky Draw Modal -->
+    <div class="modal-overlay" id="luckyDrawModal">
+        <div class="modal-content" style="position:relative;">
+            <button class="modal-close" onclick="closeLuckyDraw()">×</button>
+            <h2 class="modal-title">🎰 Lucky Draw</h2>
+            <p class="modal-subtitle">Spin the wheel and win prizes!</p>
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <div class="wheel" id="wheel"></div>
+                <div class="wheel-center">🎁</div>
+            </div>
+            <button class="spin-btn" id="spinBtn" onclick="spinWheel()">Spin Now!</button>
+            <div class="result-display" id="resultDisplay">
+                <p class="result-text">🎉 You won:</p>
+                <p class="result-amount" id="prizeAmount">$0.50</p>
+            </div>
+            <p class="spins-left" id="spinsLeft">3 spins left today</p>
+        </div>
+    </div>
+
+    <script>
+        // Product Data - 40 products with real images
+        const joinGroupsProducts = [
+            { id: 1, name: 'iPhone 15 Pro Max 256GB', price: 899, original: 1199, joined: 45, total: 50, compensation: 35, img: 'images/iPhone 15 Pro Max 256GB.png' },
+            { id: 2, name: 'Nike Air Max 90', price: 79, original: 130, joined: 23, total: 30, compensation: 12, img: 'images/Nike Air Max 90.png' },
+            { id: 3, name: 'Samsung Galaxy S24 Ultra', price: 799, original: 1099, joined: 67, total: 80, compensation: 28, img: 'images/Samsung Galaxy S24 Ultra.png' },
+            { id: 4, name: 'Dyson V15 Detect', price: 399, original: 599, joined: 18, total: 25, compensation: 22, img: 'images/Dyson V15 Detect.png' },
+            { id: 5, name: 'MacBook Air M3', price: 899, original: 1249, joined: 34, total: 40, compensation: 30, img: 'images/MacBook Air M3.jpg' },
+            { id: 6, name: 'Apple Watch Series 9', price: 299, original: 429, joined: 56, total: 60, compensation: 18 },
+            { id: 7, name: 'Sony WH-1000XM5', price: 249, original: 399, joined: 41, total: 50, compensation: 15, img: 'images/Sony WH-1000XM5.jpg' },
+            { id: 8, name: 'iPad Pro 12.9"', price: 799, original: 1099, joined: 29, total: 35, compensation: 25 },
+            { id: 9, name: 'AirPods Pro 2nd Gen', price: 179, original: 249, joined: 89, total: 100, compensation: 10, img: 'images/AirPods Pro 2nd Gen.jpg' },
+            { id: 10, name: 'Nintendo Switch OLED', price: 279, original: 349, joined: 52, total: 60, compensation: 14, img: 'images/Nintendo Switch OLED.jpg' },
+            { id: 11, name: 'PS5 Console Bundle', price: 449, original: 549, joined: 38, total: 45, compensation: 20, img: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80' },
+            { id: 12, name: 'Canon EOS R6 Mark II', price: 1499, original: 1999, joined: 12, total: 20, compensation: 40, img: 'images/Canon EOS R6.jpg' },
+            { id: 13, name: 'Bose QuietComfort Ultra', price: 329, original: 429, joined: 27, total: 35, compensation: 16 },
+            { id: 14, name: 'Samsung 65" OLED TV', price: 1299, original: 1799, joined: 8, total: 15, compensation: 38, img: 'images/Samsung.png' },
+            { id: 15, name: 'Apple iMac 24"', price: 1099, original: 1499, joined: 15, total: 20, compensation: 32, img: 'images/Apple iMac.jpg' },
+            { id: 16, name: 'Dyson Airwrap Complete', price: 399, original: 549, joined: 33, total: 40, compensation: 18, img: 'images/Dyson Airwrap.jpg' },
+            { id: 17, name: 'Ray-Ban Meta Smart Glasses', price: 299, original: 379, joined: 44, total: 50, compensation: 12, img: 'images/Ray-Ban Meta.jpg' },
+            { id: 18, name: 'DJI Mini 4 Pro', price: 759, original: 969, joined: 21, total: 30, compensation: 24 },
+            { id: 19, name: 'Herman Miller Aeron', price: 1195, original: 1495, joined: 6, total: 10, compensation: 35 },
+            { id: 20, name: 'Rolex Submariner Date', price: 8999, original: 10100, joined: 3, total: 5, compensation: 40, img: 'images/Rolex Submariner.jpg' }
+        ];
+
+        const recommendedProducts = [
+            { id: 1, name: 'iPhone 15 Pro Max 256GB', price: 899, original: 1199, groupSize: 3, compensation: 35, img: 'images/iPhone 15 Pro Max 256GB.png' },
+            { id: 2, name: 'Nike Air Max 90', price: 79, original: 130, groupSize: 5, compensation: 12, img: 'images/Nike Air Max 90.png' },
+            { id: 3, name: 'Samsung Galaxy S24 Ultra', price: 799, original: 1099, groupSize: 5, compensation: 28, img: 'images/Samsung Galaxy S24 Ultra.png' },
+            { id: 4, name: 'Dyson V15 Detect', price: 399, original: 599, groupSize: 4, compensation: 22, img: 'images/Dyson V15 Detect.png' },
+            { id: 22, name: 'Adidas Ultraboost 22', price: 99, original: 180, groupSize: 5, compensation: 15, img: 'images/Adidas.png' },
+            { id: 23, name: 'Samsung Galaxy Watch 6', price: 229, original: 329, groupSize: 4, compensation: 18, img: 'images/Samsung.png' },
+            { id: 24, name: 'LG C3 55" OLED TV', price: 1196, original: 1496, groupSize: 3, compensation: 28, img: 'images/LG.png' },
+            { id: 25, name: 'Microsoft Surface Pro 9', price: 799, original: 1099, groupSize: 4, compensation: 25, img: 'images/Microsoft.png' },
+            { id: 5, name: 'MacBook Air M3', price: 899, original: 1249, groupSize: 3, compensation: 30, img: 'images/MacBook Air M3.jpg' },
+            { id: 6, name: 'Apple Watch Series 9', price: 299, original: 429, groupSize: 4, compensation: 18 },
+            { id: 7, name: 'Sony WH-1000XM5', price: 249, original: 399, groupSize: 5, compensation: 15, img: 'images/Sony WH-1000XM5.jpg' },
+            { id: 8, name: 'iPad Pro 12.9"', price: 799, original: 1099, groupSize: 3, compensation: 25 },
+            { id: 9, name: 'AirPods Pro 2nd Gen', price: 179, original: 249, groupSize: 8, compensation: 10, img: 'images/AirPods Pro 2nd Gen.jpg' },
+            { id: 10, name: 'Nintendo Switch OLED', price: 279, original: 349, groupSize: 5, compensation: 14, img: 'images/Nintendo Switch OLED.jpg' },
+            { id: 11, name: 'PS5 Console Bundle', price: 449, original: 549, groupSize: 4, compensation: 20, img: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80' },
+            { id: 26, name: 'GoPro Hero 12 Black', price: 299, original: 399, groupSize: 5, compensation: 14 },
+            { id: 28, name: 'Dyson Pure Cool', price: 349, original: 499, groupSize: 4, compensation: 20, img: 'images/Dyson V15 Detect.png' },
+            { id: 38, name: 'Apple HomePod (2nd Gen)', price: 229, original: 299, groupSize: 4, compensation: 15 },
+            { id: 39, name: 'Sonos Arc Soundbar', price: 699, original: 899, groupSize: 3, compensation: 24, img: 'images/Sonos Arc.jpg' },
+            { id: 40, name: 'Tiffany & Co. Silver Bracelet', price: 150, original: 200, groupSize: 5, compensation: 18, img: 'images/Tiffany Bracelet.jpg' }
+        ];
+
+        // Render Join Groups
+        function renderJoinGroups() {
+            const container = document.getElementById('joinGroupsList');
+            container.innerHTML = joinGroupsProducts.map(product => {
+                const progress = (product.joined / product.total) * 100;
+                const hours = Math.floor(Math.random() * 12) + 1;
+                const mins = Math.floor(Math.random() * 60);
+                const secs = Math.floor(Math.random() * 60);
+                const img = product.img || `https://picsum.photos/seed/product${product.id}/400/300`;
+                return `
+                    <a href="join-detail.html?id=${product.id}" class="join-card" style="text-decoration:none;color:inherit;display:block;">
+                        <div class="join-card-image">
+                            <img src="${img}" alt="${product.name}" loading="lazy">
+                            <div class="compensation-badge">+$${product.compensation}</div>
+                        </div>
+                        <div class="join-card-body">
+                            <div class="join-card-title">${product.name}</div>
+                            <div class="join-card-prices">
+                                <span class="join-card-price">$${product.price}</span>
+                                <span class="join-card-original">$${product.original}</span>
+                            </div>
+                            <div class="join-card-progress">
+                                <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+                                <div class="progress-text">${product.joined}/${product.total} joined</div>
+                            </div>
+                            <div class="join-card-meta">
+                                <span class="countdown">${hours}h ${mins}m ${secs}s</span>
+                            </div>
+                            <button class="join-card-btn" onclick="event.preventDefault();window.location.href='join-detail.html?id=${product.id}'">Join Now</button>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        // Render Recommended
+        function renderRecommended() {
+            const container = document.getElementById('recommendedList');
+            container.innerHTML = recommendedProducts.map(product => {
+                const img = product.img || `https://picsum.photos/seed/product${product.id}/400/300`;
+                return `
+                    <a href="product-detail.html?id=${product.id}" class="recommended-card" style="text-decoration:none;color:inherit;display:block;">
+                        <div class="recommended-card-image">
+                            <img src="${img}" alt="${product.name}" loading="lazy">
+                            <div class="compensation-badge">+$${product.compensation}</div>
+                        </div>
+                        <div class="recommended-card-body">
+                            <div class="recommended-card-title">${product.name}</div>
+                            <div class="recommended-card-prices">
+                                <span class="recommended-card-price">$${product.price}</span>
+                                <span class="recommended-card-original">$${product.original}</span>
+                            </div>
+                            <div class="recommended-card-info">
+                                <span class="group-size">${product.groupSize} people</span>
+                            </div>
+                            <button class="recommended-card-btn" onclick="event.preventDefault();window.location.href='product-detail.html?id=${product.id}'">Start Group</button>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // Search Toggle
+        document.getElementById('searchToggle').addEventListener('click', function() {
+            document.getElementById('searchBox').classList.toggle('active');
+            document.getElementById('searchInput').focus();
+        });
+
+        // Language Selector
+        document.getElementById('langBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+            document.getElementById('langDropdown').classList.toggle('active');
+        });
+
+        document.querySelectorAll('.lang-option').forEach(opt => {
+            opt.addEventListener('click', function() {
+                document.getElementById('currentLang').textContent = this.dataset.lang;
+                document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('langDropdown').classList.remove('active');
+                document.getElementById('langBtn').classList.remove('active');
+                showToast('🌐 Language: ' + this.textContent);
+            });
+        });
+
+        document.addEventListener('click', function() {
+            document.getElementById('langDropdown').classList.remove('active');
+            document.getElementById('langBtn').classList.remove('active');
+        });
+
+        // Init
+        renderJoinGroups();
+        renderRecommended();
+
+        // Claim Modal
+        function openClaimModal() {
+            document.getElementById('claimModal').classList.add('active');
+        }
+
+        function closeClaimModal() {
+            document.getElementById('claimModal').classList.remove('active');
+        }
+
+        function goToRegister() {
+            closeClaimModal();
+            window.location.href = 'login.html?action=register';
+        }
+
+        function goToLogin() {
+            closeClaimModal();
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('claimModal').addEventListener('click', function(e) {
+            if (e.target === this) closeClaimModal();
+        });
+
+        // Lucky Draw
+        let spinsRemaining = 3;
+        let isSpinning = false;
+
+        function openLuckyDraw() {
+            document.getElementById('luckyDrawModal').classList.add('active');
+        }
+
+        function closeLuckyDraw() {
+            document.getElementById('luckyDrawModal').classList.remove('active');
+        }
+
+        document.getElementById('luckyDrawModal').addEventListener('click', function(e) {
+            if (e.target === this) closeLuckyDraw();
+        });
+
+        function spinWheel() {
+            if (isSpinning || spinsRemaining <= 0) return;
+            isSpinning = true;
+            spinsRemaining--;
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('spinsLeft').textContent = spinsRemaining + ' spins left today';
+            document.getElementById('resultDisplay').classList.remove('show');
+
+            const wheel = document.getElementById('wheel');
+            const prizes = ['$0.50', '$1.00', '$2.00', '$0.10', '$5.00', 'Try Again'];
+            const segments = prizes.length;
+            const segmentDeg = 360 / segments;
+            const prizeIndex = Math.floor(Math.random() * segments);
+            const rotation = 1800 + (360 - (prizeIndex * segmentDeg + segmentDeg / 2));
+
+            wheel.style.transform = 'rotate(' + rotation + 'deg)';
+
+            setTimeout(function() {
+                isSpinning = false;
+                document.getElementById('spinBtn').disabled = false;
+                const prize = prizes[prizeIndex];
+                const prizeEl = document.getElementById('prizeAmount');
+                if (prize === 'Try Again') {
+                    document.querySelector('.result-text').textContent = '😔 Better luck next time!';
+                    prizeEl.textContent = '';
+                    prizeEl.style.color = 'var(--text-muted)';
+                } else {
+                    document.querySelector('.result-text').textContent = '🎉 You won:';
+                    prizeEl.textContent = prize;
+                    prizeEl.style.color = 'var(--success)';
+                }
+                document.getElementById('resultDisplay').classList.add('show');
+                if (spinsRemaining <= 0) {
+                    document.getElementById('spinBtn').textContent = 'No Spins Left';
+                    document.getElementById('spinBtn').disabled = true;
+                }
+            }, 4200);
+        }
+    </script>
+</body>
+</html>
+getElementById('spinBtn').disabled = true;
+                }
+            }, 4200);
+        }
+    </script>
+</body>
+</html>
