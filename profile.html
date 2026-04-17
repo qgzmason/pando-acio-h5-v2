@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>pando - Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --accent: #ff4d4d;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg-main: #f8fafc; /* Softer background */
+            --bg-card: #ffffff;
+            --text-main: #1a1a1a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border: #f1f5f9;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); line-height: 1.5; padding-bottom: 90px; }
+
+        /* Order Card inside Modal (inspired by orders.html) */
+        .modal-order-card {
+            background: #fff;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #f1f5f9;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .modal-order-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        .modal-order-content {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+        }
+        .modal-order-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+        .modal-order-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .modal-order-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .modal-order-price {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .modal-order-status {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            align-self: flex-start;
+        }
+        .status-pending { background: #fffbeb; color: #d97706; }
+        .status-shipping { background: #f0f9ff; color: #0284c7; }
+        .status-completed { background: #f0fdf4; color: #16a34a; }
+
+        /* Team Modal Tabs */
+        .team-tabs {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .team-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .team-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Member Item */
+        .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .member-left { display: flex; align-items: center; gap: 12px; }
+        .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; flex-shrink: 0; }
+        .member-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+        .member-meta { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .member-right { text-align: right; }
+        .income-pending { font-size: 12px; color: var(--accent); font-weight: 700; margin-bottom: 2px; }
+        .income-total { font-size: 14px; font-weight: 800; color: var(--primary); }
+
+        /* Form Overlay */
+        .form-overlay {
+            display: none;
+            background: white;
+            padding: 0;
+            z-index: 10;
+        }
+        .form-overlay.active { display: block; }
+        .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: var(--text-secondary); }
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #f1f5f9;
+            background: #f8fafc;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            transition: var(--transition);
+        }
+        .form-input:focus { border-color: var(--primary); background: white; }
+
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; pointer-events: none; transition: var(--transition); display: flex; align-items: flex-end; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-card { width: 100%; background: white; border-radius: 36px 36px 0 0; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 28px 24px; max-height: 92vh; overflow-y: auto; position: relative; }
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .modal-title { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .modal-body { margin-bottom: 24px; }
+        .modal-footer { display: flex; gap: 14px; margin-top: 20px; }
+        .modal-btn { flex: 1; height: 54px; border-radius: 18px; border: none; font-size: 16px; font-weight: 800; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .modal-btn:active { transform: scale(0.97); }
+        .btn-confirm { background: var(--primary); color: white; }
+        .btn-cancel { background: #f1f5f9; color: var(--text-secondary); }
+
+        /* Animations */
+        @keyframes gradient-pulse {
+            0% { color: #ff4d4d; transform: scale(1); filter: drop-shadow(0 0 2px rgba(255, 77, 77, 0.3)); }
+            50% { color: #f97316; transform: scale(1.05); filter: drop-shadow(0 0 12px rgba(249, 115, 22, 0.6)); }
+            100% { color: #ff4d4d; transform: scale(1); filter: drop-shadow(0 0 2px rgba(255, 77, 77, 0.3)); }
+        }
+        .pulsate-gradient { animation: gradient-pulse 2s infinite ease-in-out; font-weight: 800; display: inline-block; }
+
+        @keyframes shimmer-gold {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmer-progress {
+            position: absolute; top: 0; left: 0; height: 100%; width: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 165, 0, 0.15), transparent);
+            background-size: 200% 100%;
+            animation: shimmer-gold 2.5s infinite linear;
+        }
+
+        /* Profile Header Section */
+        .profile-header { background: var(--primary); padding: 50px 20px 60px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; color: white; position: relative; overflow: hidden; }
+        .user-info-row { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2; }
+        .user-meta { display: flex; align-items: center; gap: 16px; }
+        .avatar-box { position: relative; width: 68px; height: 68px; }
+        .avatar { width: 100%; height: 100%; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); object-fit: cover; background: #333; }
+        .user-text h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: white; letter-spacing: -0.5px; }
+        .id-badge { font-size: 11px; opacity: 0.6; letter-spacing: 0.5px; }
+        .level-tag { background: var(--accent); color: white; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; }
+        
+        .qr-section { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: var(--transition); }
+        .qr-section:active { transform: scale(0.95); }
+        .qr-header-icon { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .qr-label { font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .order-bar { background: white; margin: -30px 16px 24px; padding: 18px 10px; border-radius: 20px; display: flex; justify-content: space-around; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.04); position: relative; z-index: 10; }
+        .order-item { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; cursor: pointer; transition: var(--transition); }
+        .order-item:active { transform: translateY(-2px); }
+        .order-icon { color: var(--primary); width: 28px; height: 28px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .order-icon svg { width: 24px; height: 24px; stroke-width: 2px; }
+        .order-badge { position: absolute; top: -6px; right: -6px; background: var(--accent); color: white; font-size: 9px; font-weight: 800; min-width: 15px; height: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1.5px solid white; }
+        .order-label { font-size: 10px; font-weight: 700; color: var(--text-secondary); }
+
+        .wallet-card { background: var(--primary); margin: 0 16px 20px; padding: 28px 24px; border-radius: 28px; color: white; box-shadow: 0 15px 35px rgba(0,0,0,0.15); position: relative; }
+        .balance-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .balance-label { font-size: 12px; opacity: 0.8; font-weight: 500; }
+        .balance-history { font-size: 11px; opacity: 0.8; text-decoration: underline; cursor: pointer; font-weight: 600; }
+        .balance-amount { font-size: 36px; font-weight: 800; margin-bottom: 28px; letter-spacing: -1px; }
+        
+        .earnings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,0.15); padding: 1px; border-radius: 16px; margin-bottom: 8px; overflow: hidden; }
+        .earning-item { background: var(--primary); padding: 20px 10px; text-align: center; cursor: pointer; transition: var(--transition); }
+        .earning-item:active { background: #262626; }
+        .earning-val { display: block; font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+        .earning-lab { display: block; font-size: 10px; opacity: 0.7; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; background: white; margin: 0 16px 24px; padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; transition: var(--transition); }
+        .menu-item:active { transform: translateY(-3px); }
+        .menu-icon { width: 44px; height: 44px; background: #f8fafc; border-radius: 14px; display: flex; align-items: center; justify-content: center; transition: var(--transition); color: var(--text-secondary); }
+        .menu-icon svg { width: 22px; height: 22px; stroke-width: 2.2px; }
+        .menu-label { font-size: 10px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.3px; }
+
+        /* Upgrade Section */
+        .upgrade-card { background: white; margin: 0 16px 20px; padding: 22px; border-radius: 24px; border: 1px solid var(--border); cursor: pointer; box-shadow: var(--shadow-sm); }
+        .upgrade-card:active { transform: scale(0.98); }
+        .upgrade-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .next-level { font-size: 15px; font-weight: 800; color: #1a1a1a; }
+        .level-perks { font-size: 11px; color: #ff4d4d; font-weight: 700; }
+        .progress-container { height: 8px; background: #f1f5f9; border-radius: 4px; margin-bottom: 10px; overflow: hidden; position: relative; }
+        .progress-bar { height: 100%; background: #1a1a1a; border-radius: 4px; position: relative; z-index: 1; }
+        .progress-text { display: flex; justify-content: space-between; font-size: 11px; color: #475569; font-weight: 700; }
+
+        /* Exclusive Recruitment Promo */
+        .leader-promo { background: linear-gradient(135deg, var(--primary), #444); margin: 0 16px 20px; padding: 24px; border-radius: var(--radius-lg); color: white; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-md); }
+        .leader-promo:active { transform: scale(0.98); }
+        .leader-promo::before { content: 'LEADER'; position: absolute; right: -10px; bottom: -10px; font-size: 50px; font-weight: 900; opacity: 0.05; color: white; }
+        .leader-info { position: relative; z-index: 2; }
+        .leader-tag { font-size: 10px; font-weight: 800; color: #fbbf24; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1.5px; display: block; }
+        .leader-title { font-size: 17px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .leader-desc { font-size: 11px; opacity: 0.7; }
+        .leader-arrow { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; }
+
+        /* Global Pool Banner */
+        .pool-banner { background: var(--primary); margin: 0 16px 30px; padding: 28px 24px; border-radius: var(--radius-lg); color: white; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .pool-banner::after { content: 'DIRECTOR'; position: absolute; right: -15px; top: -15px; font-size: 40px; font-weight: 800; opacity: 0.05; color: white; transform: rotate(-5deg); }
+        .pool-header { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .pool-amount { font-size: 32px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .pool-desc { font-size: 11px; opacity: 0.6; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); text-decoration: none; transition: var(--transition); }
+        .nav-item.active { color: var(--primary); }
+        .nav-item svg { width: 24px; height: 24px; stroke-width: 2.2px; }
+        .nav-item span { font-size: 11px; font-weight: 700; }
+
+        /* Modals (Already defined, removing duplicates) */
+        /* List Styles */
+        .list-group { display: flex; flex-direction: column; gap: 14px; }
+        .list-item { background: #f8fafc; padding: 18px; border-radius: 20px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; }
+        .list-item:active { background: #f1f5f9; transform: scale(0.98); }
+        .list-item-content h5 { font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+        .list-item-content p { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .list-item-action { font-size: 15px; font-weight: 800; color: var(--accent); }
+
+        .member-item { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-bottom: 1px solid #f1f5f9; position: relative; }
+        .member-avatar { width: 44px; height: 44px; border-radius: 14px; background: #f1f5f9; flex-shrink: 0; border: 1px solid #e2e8f0; }
+        .member-info { flex: 1; }
+        .member-name { font-size: 15px; font-weight: 800; color: var(--primary); }
+        .member-status { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .member-earnings { text-align: right; }
+
+        .bank-item { background: white; padding: 20px; border-radius: 20px; border: 1.5px solid #f1f5f9; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .bank-info h5 { font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+        .bank-info p { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .bank-action-area { display: flex; align-items: center; gap: 14px; }
+        .btn-delete { width: 36px; height: 36px; border-radius: 12px; background: #fee2e2; color: #ef4444; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; font-weight: 800; transition: var(--transition); }
+        .btn-delete:active { background: #fecaca; }
+        .btn-add-circle { width: 64px; height: 64px; border-radius: 32px; background: var(--primary); color: white; border: none; display: flex; align-items: center; justify-content: center; margin: 15px auto; cursor: pointer; font-size: 36px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transition: var(--transition); }
+        .btn-add-circle:active { transform: rotate(90deg) scale(0.9); }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 12px; font-weight: 800; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input, .input-group select { width: 100%; height: 56px; border-radius: 16px; border: 1.5px solid #e2e8f0; padding: 0 18px; font-size: 15px; outline: none; transition: var(--transition); background: #f8fafc; }
+        .input-group input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(26,26,26,0.05); }
+
+        .tree-container { background: #f8fafc; padding: 24px; border-radius: 24px; border: 1px solid #e2e8f0; }
+        .tree-node { margin-left: 20px; border-left: 1.5px dashed #cbd5e1; padding-left: 24px; position: relative; margin-top: 16px; }
+        .tree-node::before { content: ''; position: absolute; left: 0; top: 12px; width: 15px; border-top: 1.5px dashed #cbd5e1; }
+        .tree-label { font-size: 14px; font-weight: 800; color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
+        .tree-sub { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+        
+        .tab-nav { display: flex; gap: 10px; margin-bottom: 24px; background: #f1f5f9; padding: 5px; border-radius: 14px; }
+        .tab-item { flex: 1; text-align: center; padding: 12px; font-size: 14px; font-weight: 800; color: var(--text-secondary); border-radius: 11px; cursor: pointer; transition: var(--transition); }
+        .tab-item.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        /* Form Overlay */
+        .form-overlay { display: none; background: white; padding: 0; z-index: 100; box-sizing: border-box; width: 100%; }
+        .form-overlay.active { display: block; position: relative; top: 0; left: 0; }
+        .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 12px; font-weight: 800; margin-bottom: 8px; color: var(--text-secondary); text-transform: uppercase; }
+        .form-input { width: 100%; height: 56px; border-radius: 16px; border: 1.5px solid #e2e8f0; background: #f8fafc; padding: 0 18px; font-size: 15px; font-weight: 600; outline: none; transition: var(--transition); box-sizing: border-box; }
+        .form-input:focus { border-color: var(--primary); background: white; }
+
+        /* Demo List & Interaction Styles */
+        .demo-list-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: #fff; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 12px; transition: var(--transition); }
+        .demo-list-item:active { transform: scale(0.98); background: #f9fafb; }
+        .demo-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; background: #f1f5f9; flex-shrink: 0; }
+        .demo-info { flex: 1; min-width: 0; }
+        .demo-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .demo-desc { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .demo-price { font-size: 14px; font-weight: 800; color: var(--primary); margin-top: 4px; }
+        .delete-btn { width: 32px; height: 32px; border-radius: 50%; background: #fee2e2; color: #ef4444; border: none; font-size: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
+        .delete-btn:active { background: #fecaca; }
+        .team-stats-box div { flex: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="profile-header">
+        <div class="user-info-row">
+            <div class="user-meta">
+                <div class="avatar-box">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200" class="avatar" alt="User">
+                </div>
+                <div class="user-text">
+                    <h2>Alex Mason</h2>
+                    <div class="id-badge">ID: 90369043</div>
+                    <div class="level-tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:12px;height:12px;"><path d="M20 6L9 17l-5-5"/></svg>
+                        Expert Member
+                    </div>
+                </div>
+            </div>
+            <div class="qr-section" onclick="openModal('modal-qr')">
+                <div class="qr-header-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:32px;height:32px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3m4 0h-1m-3 3h1m3 0h-3m1 4h3m-7 0h1"/></svg>
+                </div>
+                <span class="qr-label">Sharing Code</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-bar">
+        <div class="order-item" onclick="location.href='orders.html?tab=pay'">
+            <div class="order-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M2 10h20"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="15" r="1"/></svg>
+                <span class="order-badge">2</span>
+            </div>
+            <span class="order-label">To Pay</span>
+        </div>
+        <div class="order-item" onclick="location.href='orders.html?tab=receive'">
+            <div class="order-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 17h4V5H2v12h3m15 0h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+                <span class="order-badge">5</span>
+            </div>
+            <span class="order-label">To Receive</span>
+        </div>
+        <div class="order-item" onclick="location.href='orders.html?tab=rate'">
+            <div class="order-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 7h.01M8 7h.01M16 7h.01"/></svg></div>
+            <span class="order-label">To Rate</span>
+        </div>
+        <div class="order-item" onclick="location.href='orders.html?tab=service'">
+            <div class="order-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></div>
+            <span class="order-label">Service</span>
+        </div>
+        <div class="order-item" onclick="location.href='orders.html?tab=all'">
+            <div class="order-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div>
+            <span class="order-label">Orders</span>
+        </div>
+    </div>
+
+    <div class="wallet-card">
+        <div class="balance-header">
+            <span class="balance-label">Total Historical Income</span>
+            <span class="balance-history" onclick="openModal('modal-bill')">History →</span>
+        </div>
+        <div class="balance-amount" id="main-historical-income">$1,570.80</div>
+        
+        <div class="earnings-grid">
+            <div class="earning-item" onclick="openModal('modal-pending')">
+                <span class="earning-val pulsate-gradient">$320.00</span>
+                <span class="earning-lab">Pending Income</span>
+            </div>
+            <div class="earning-item" onclick="openModal('modal-withdraw-select')">
+                <span class="earning-val" id="card-withdrawable-balance">$1,250.80</span>
+                <span class="earning-lab">Withdrawable</span>
+            </div>
+            <div class="earning-item" onclick="openModal('modal-bonus')">
+                <span class="earning-val">$7.00</span>
+                <span class="earning-lab">Bonus Pool</span>
+            </div>
+            <div class="earning-item">
+                <span class="earning-val">850</span>
+                <span class="earning-lab">Contribution</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="upgrade-card" onclick="openModal('modal-levels')">
+        <div class="upgrade-header">
+            <div class="next-level">Next Level: Star Elite</div>
+            <div class="level-perks">Earn 3% team benefit after achievement</div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 83.3%;"></div>
+        </div>
+        <div class="progress-text">
+            <span>Direct Referral: 25/30</span>
+            <span>Member Participated: 20/30</span>
+        </div>
+    </div>
+
+    <div class="menu-grid">
+        <div class="menu-item" onclick="openModal('modal-team')">
+            <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <span class="menu-label">My Team</span>
+        </div>
+        <div class="menu-item" onclick="openModal('modal-earnings-steps')">
+            <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <span class="menu-label">Earnings</span>
+        </div>
+        <div class="menu-item" onclick="openModal('modal-invite')">
+            <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <span class="menu-label">Referral</span>
+        </div>
+        <div class="menu-item" onclick="openModal('modal-bank')">
+            <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <span class="menu-label">Bank Card</span>
+        </div>
+        <div class="menu-item" onclick="openModal('modal-address')">
+            <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <span class="menu-label">Addresses</span>
+        </div>
+        <div class="menu-item" onclick="location.href='academy.html'">
+            <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <span class="menu-label">Academy</span>
+        </div>
+        <div class="menu-item" onclick="location.href='matching.html'">
+            <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <span class="menu-label">Support</span>
+        </div>
+        <div class="menu-item" onclick="openModal('modal-settings')">
+            <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <span class="menu-label">Settings</span>
+        </div>
+    </div>
+
+    <div class="leader-promo" onclick="location.href='leader.html'">
+        <div class="leader-info">
+            <span class="leader-tag">Exclusive Recruiting</span>
+            <div class="leader-title">GENESIS SEED LEADER</div>
+            <div class="leader-desc">Apply to earn $1,650/mo with your physical store</div>
+        </div>
+        <div class="leader-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:18px;height:18px;"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+    </div>
+
+    <div class="pool-banner">
+        <div class="pool-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px;"><path d="m6 9 6 6 6-6"/></svg>
+            Global Dividend Pool
+        </div>
+        <div class="pool-amount">$12,850.40</div>
+        <p class="pool-desc">Real-time pool data (Exclusive for Director Level)</p>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="categories.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            <span>Category</span>
+        </a>
+        <a href="discover.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>Discover</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span>Orders</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Me</span>
+        </a>
+    </nav>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modal-qr">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Exclusive Sharing</h3></div>
+            <div class="modal-body" style="text-align: center;">
+                <div style="width: 220px; height: 220px; background: white; margin: 0 auto; padding: 15px; border: 2px solid var(--primary); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=https://pando.shop/ref/90369043" style="width: 100%; border-radius: 10px;">
+                </div>
+                <div style="margin-top: 15px;">
+                    <span style="font-size: 16px; font-weight: 800; color: var(--primary);">REF: 90369043</span>
+                    <p style="margin-top: 5px; font-size: 11px; color: var(--text-muted);">Exclusive Sharing Code: Share to grow your team!</p>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button class="modal-btn btn-confirm" style="flex: 1;" onclick="alert('Saved to gallery!')">Download Card</button>
+                    <button class="modal-btn btn-confirm" style="flex: 1; background: #0088cc;" onclick="alert('Link copied to Telegram!')">Share Link</button>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-cancel" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-order-pay">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Unpaid Orders</h3></div>
+            <div class="modal-body">
+                <!-- Order 1 -->
+                <div class="modal-order-card">
+                    <div class="modal-order-header">
+                        <span>Order #PA20240331001</span>
+                        <span>Today</span>
+                    </div>
+                    <div class="modal-order-content">
+                        <img src="https://picsum.photos/seed/p1/160/160" class="modal-order-img">
+                        <div class="modal-order-info">
+                            <div class="modal-order-title">iPhone 15 Pro Max 256GB</div>
+                            <div class="modal-order-price">$1,199.00</div>
+                        </div>
+                        <span class="modal-order-status status-pending">Pending</span>
+                    </div>
+                </div>
+                <!-- Order 2 -->
+                <div class="modal-order-card">
+                    <div class="modal-order-header">
+                        <span>Order #PA20240331005</span>
+                        <span>Today</span>
+                    </div>
+                    <div class="modal-order-content">
+                        <img src="https://picsum.photos/seed/p2/160/160" class="modal-order-img">
+                        <div class="modal-order-info">
+                            <div class="modal-order-title">Cambodian Dried Mango (500g)</div>
+                            <div class="modal-order-price">$15.00</div>
+                        </div>
+                        <span class="modal-order-status status-pending">Pending</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn btn-confirm" onclick="alert('Redirecting to payment gateway...')">Pay All Now</button>
+                <button class="modal-btn btn-cancel" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-order-receive">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">In Transit</h3></div>
+            <div class="modal-body">
+                <div class="modal-order-card">
+                    <div class="modal-order-header">
+                        <span>Order #PA20240328012</span>
+                        <span>Mar 28, 2024</span>
+                    </div>
+                    <div class="modal-order-content">
+                        <img src="https://picsum.photos/seed/p3/160/160" class="modal-order-img">
+                        <div class="modal-order-info">
+                            <div class="modal-order-title">Nike Air Max 270</div>
+                            <div class="modal-order-price">$145.00</div>
+                        </div>
+                        <span class="modal-order-status status-shipping">Shipping</span>
+                    </div>
+                    <div style="padding: 10px 12px; font-size: 11px; background: #f8fafc; border-top: 1px solid #f1f5f9; color: var(--success); font-weight: 700;">
+                        Currently at: Phnom Penh Sorting Hub
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Order Modals -->
+    <div class="modal-overlay" id="modal-order-pay">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">To Pay (2)</h3></div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <div class="list-item"><div class="list-item-content"><h5>iPhone 15 Pro Max</h5><p>Order: #PA9032 | 1 unit</p></div><div class="list-item-action">$1,199.00</div></div>
+                    <div class="list-item"><div class="list-item-content"><h5>Local Dried Mango</h5><p>Order: #PA9035 | 5 units</p></div><div class="list-item-action">$15.00</div></div>
+                </div>
+                <button class="modal-btn btn-confirm" style="margin-top: 20px; width: 100%;" onclick="alert('Redirecting to payment...')">Pay All Now</button>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-cancel" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-order-receive">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">To Receive (5)</h3></div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <div class="list-item">
+                        <div class="list-item-content"><h5>Smart Watch Ultra</h5><p>Shipping: Local Express</p></div>
+                        <div class="list-item-action" style="font-size: 11px; color: var(--success);">In Transit</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-content"><h5>Coffee Beans 500g</h5><p>Shipping: Phnom Penh Delivery</p></div>
+                        <div class="list-item-action" style="font-size: 11px; color: var(--success);">Out for Delivery</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-order-all">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">All Orders</h3></div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <div class="list-item"><div class="list-item-content"><h5>Completed Order #PA8990</h5><p>2026-04-10 | $45.00</p></div></div>
+                    <div class="list-item"><div class="list-item-content"><h5>Completed Order #PA8985</h5><p>2026-04-05 | $120.00</p></div></div>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-aftersales">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">After-sales Policy</h3></div>
+            <div class="modal-body">
+                <div style="background: #fff4f4; padding: 15px; border-radius: 10px; border: 1px solid #fee2e2;">
+                    <h4 style="color: #ef4444; font-size: 14px; margin-bottom: 8px;">Important Notice</h4>
+                    <p style="font-size: 12px; line-height: 1.6; color: #b91c1c;">
+                        Due to our unique profit-sharing model, <strong>refunds are not supported</strong> unless there is a verified product quality issue.
+                        Refunds disrupt the entire referral and commission chain.
+                    </p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="modal-btn btn-confirm" style="width: 100%; margin-bottom: 10px;" onclick="alert('Contacting Customer Service...')">Contact Support</button>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-cancel" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Income Modal -->
+    <div class="modal-overlay" id="modal-pending">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Pending Income Details</h3></div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <div class="list-item" onclick="openModal('modal-direct-award')">
+                        <div class="list-item-content"><h5>Direct Referral Award</h5><p>Status: Completed</p></div>
+                        <div class="list-item-action">+$45.00</div>
+                    </div>
+                    <div class="list-item" onclick="openModal('modal-indirect-award')">
+                        <div class="list-item-content"><h5>Indirect Referral Award</h5><p>Status: Processing...</p></div>
+                        <div class="list-item-action pulsate-gradient">+$12.50</div>
+                    </div>
+                    <div class="list-item" onclick="openModal('modal-team-award')">
+                        <div class="list-item-content"><h5>Team Award</h5><p>Status: Processing...</p></div>
+                        <div class="list-item-action pulsate-gradient">+$145.20</div>
+                    </div>
+                    <div class="list-item" onclick="openModal('modal-global-pool')">
+                        <div class="list-item-content"><h5>Global Dividend</h5><p>Status: Processing...</p></div>
+                        <div class="list-item-action pulsate-gradient">+$117.30</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Team Modal -->
+    <div class="modal-overlay" id="modal-team">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">My Team</h3>
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Total: 216</div>
+            </div>
+            <div class="modal-body">
+                <div class="team-tabs">
+                    <div class="team-tab active" onclick="switchTeamTab(this, 'direct')">Direct</div>
+                    <div class="team-tab" onclick="switchTeamTab(this, 'indirect')">Indirect</div>
+                </div>
+
+                <!-- Direct List -->
+                <div id="direct-list" class="member-list active">
+                    <!-- Member Row -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Alex M***</h4>
+                                <div class="member-meta">2026-03-15 | Expert</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$12.50</div>
+                            <div class="income-total">$450.00</div>
+                        </div>
+                    </div>
+                    <!-- Row 2 -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Sokhom P***</h4>
+                                <div class="member-meta">2026-03-20 | Expert</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$8.20</div>
+                            <div class="income-total">$320.00</div>
+                        </div>
+                    </div>
+                    <!-- Row 3 -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Vuthy B***</h4>
+                                <div class="member-meta">2026-03-22 | Elite</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$25.00</div>
+                            <div class="income-total">$1,250.00</div>
+                        </div>
+                    </div>
+                    <!-- Row 4 -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Sarah K***</h4>
+                                <div class="member-meta">2026-03-25 | Expert</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$5.00</div>
+                            <div class="income-total">$88.00</div>
+                        </div>
+                    </div>
+                    <!-- Row 5 -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Borey C***</h4>
+                                <div class="member-meta">2026-03-28 | Expert</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$0.00</div>
+                            <div class="income-total">$45.00</div>
+                        </div>
+                    </div>
+                    <!-- Row 6 -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Chann S***</h4>
+                                <div class="member-meta">2026-04-01 | Expert</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$12.50</div>
+                            <div class="income-total">$150.00</div>
+                        </div>
+                    </div>
+                    <!-- Row 7 -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Malis T***</h4>
+                                <div class="member-meta">2026-04-05 | Expert</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$4.20</div>
+                            <div class="income-total">$92.00</div>
+                        </div>
+                    </div>
+                    <!-- Row 8 -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Rithy O***</h4>
+                                <div class="member-meta">2026-04-08 | Expert</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$2.10</div>
+                            <div class="income-total">$12.00</div>
+                        </div>
+                    </div>
+                    <!-- Row 9 -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Nimol L***</h4>
+                                <div class="member-meta">2026-04-10 | Expert</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$15.00</div>
+                            <div class="income-total">$210.00</div>
+                        </div>
+                    </div>
+                    <!-- Row 10 -->
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar"></div>
+                            <div class="member-info">
+                                <h4>Dara V***</h4>
+                                <div class="member-meta">2026-04-12 | Expert</div>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <div class="income-pending">+$6.50</div>
+                            <div class="income-total">$45.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Indirect List (Placeholder) -->
+                <div id="indirect-list" class="member-list">
+                    <div style="padding: 40px 0; text-align: center; color: var(--text-muted);">
+                        <p style="font-size: 13px; font-weight: 600;">156 Total Indirect Members</p>
+                        <p style="font-size: 11px; margin-top: 4px;">Data loading in demo mode...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Modal Team Tree -->
+    <div class="modal-overlay" id="modal-team-tree">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Team Structure</h3></div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                <div class="tree-container">
+                    <div style="font-weight: 700; font-size: 14px; margin-bottom: 10px;">Me (Alex Mason)</div>
+                    <div class="tree-node">
+                        <div style="font-size: 12px;">Alice Wang (Direct) - $456.00</div>
+                        <div class="tree-node">
+                            <div style="font-size: 11px; color: #666;">User 102 (Indirect) - $12.00</div>
+                        </div>
+                        <div class="tree-node">
+                            <div style="font-size: 11px; color: #666;">User 105 (Indirect) - $85.00</div>
+                        </div>
+                    </div>
+                    <div class="tree-node">
+                        <div style="font-size: 12px;">Bob Chen (Direct) - $128.00</div>
+                    </div>
+                </div>
+                <button class="modal-btn btn-confirm" style="margin-top: 20px; width: 100%;" onclick="openModal('modal-invite')">Invite New Member</button>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-levels">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Membership Levels</h3></div>
+            <div class="modal-body">
+                <div class="level-card" style="background: #f8fafc; padding: 20px; border-radius: 20px; border: 1.5px solid var(--border); margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 800; color: var(--primary);">Expert Member</span>
+                        <span style="font-size: 10px; background: #dcfce7; color: #16a34a; padding: 4px 10px; border-radius: 10px; font-weight: 800;">CURRENT</span>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">Benefits: 5-2-3 Profit Sharing, Direct Referral Commission, Indirect Referral Commission.</p>
+                </div>
+                <div class="level-card" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); padding: 20px; border-radius: 20px; border: 1.5px solid #fde68a; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 800; color: #92400e;">Star Elite</span>
+                        <span style="font-size: 10px; background: #fef3c7; color: #b45309; padding: 4px 10px; border-radius: 10px; font-weight: 800;">LOCKED</span>
+                    </div>
+                    <p style="font-size: 12px; color: #b45309; line-height: 1.5;">Benefits: +3% Team Bonus on entire network volume. Requirement: 30 Direct Referrals.</p>
+                </div>
+                <div class="level-card" style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); padding: 20px; border-radius: 20px; border: 1.5px solid #bae6fd; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 800; color: #0369a1;">Director</span>
+                        <span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 10px; font-weight: 800;">LOCKED</span>
+                    </div>
+                    <p style="font-size: 12px; color: #0284c7; line-height: 1.5;">Benefits: Global Dividend Pool Share, Exclusive Leadership Training. Requirement: 3 Star Elite Downlines.</p>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Got it</button></div>
+        </div>
+    </div>
+
+    </div>
+
+    <div class="modal-overlay" id="modal-earnings-steps">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Profit Distribution</h3></div>
+            <div class="modal-body">
+                <div class="level-card">
+                    <h4>Real-time Settlement</h4>
+                    <p>Commission is credited immediately after group completion. Pending status remains until "Confirm Receipt".</p>
+                </div>
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;"><span>Direct Commission</span><span style="font-weight: 700;">$2.50 / unit</span></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;"><span>Indirect Commission</span><span style="font-weight: 700;">$1.20 / unit</span></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;"><span>Team Bonus (Expert)</span><span style="font-weight: 700;">3% Total Volume</span></div>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-settings">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Profile Settings</h3></div>
+            <div class="modal-body">
+                <form onsubmit="return false">
+                    <div class="input-group"><label>NICKNAME</label><input type="text" value="Alex Mason"></div>
+                    <div class="input-group"><label>GENDER</label><select><option>Male</option><option>Female</option><option>Other</option></select></div>
+                    <div class="input-group"><label>BIO</label><input type="text" value="Shopping together is fun!"></div>
+                    <div style="margin-top: 15px;">
+                        <button class="modal-btn btn-confirm" style="width: 100%;" onclick="alert('Profile updated!'); closeModal();">Save Profile</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-cancel" onclick="closeModal()">Cancel</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-withdraw-select">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Withdrawal</h3></div>
+            <div class="modal-body">
+                <div style="background: #f1f5f9; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 25px;">
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Withdrawable Balance</div>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--primary);">$1,250.80</div>
+                </div>
+                <div style="font-size: 12px; font-weight: 700; margin-bottom: 12px; color: var(--text-secondary);">Select Withdrawal Target</div>
+                <div class="demo-list-item" onclick="withdrawConfirm('ABA BANK (**** 8892)')">
+                    <div style="width: 44px; height: 44px; background: #004a99; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 10px;">ABA</div>
+                    <div class="demo-info">
+                        <div class="demo-title">ABA BANK (**** 8892)</div>
+                        <div class="demo-desc">3% Processing Fee Applies</div>
+                    </div>
+                </div>
+                <div class="demo-list-item" onclick="withdrawConfirm('Canadia Bank (**** 4451)')">
+                    <div style="width: 44px; height: 44px; background: #ed1c24; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 10px;">CNB</div>
+                    <div class="demo-info">
+                        <div class="demo-title">Canadia Bank (**** 4451)</div>
+                        <div class="demo-desc">3% Processing Fee Applies</div>
+                    </div>
+                </div>
+                <button class="modal-btn btn-confirm" style="width: 100%; margin-top: 15px; background: #f0f2f5; color: #1a1a1a;" onclick="openModal('modal-bank')">+ Use Different Card</button>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-cancel" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Bank Modal -->
+    <div class="modal-overlay" id="modal-bank">
+        <div class="modal-card">
+            <div id="bank-list-view">
+                <div class="modal-header">
+                    <h3 class="modal-title">Bank Accounts</h3>
+                    <button class="modal-btn" style="width: 40px; height: 40px; border-radius: 10px;" onclick="toggleForm('bank-form', true)">+</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-order-card" style="padding: 16px; background: linear-gradient(135deg, #004a99, #0066cc); color: white; border: none;">
+                        <div style="font-size: 14px; font-weight: 800; margin-bottom: 20px;">ABA BANK</div>
+                        <div style="font-size: 18px; letter-spacing: 2px; margin-bottom: 10px;">**** **** **** 8892</div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                            <span style="font-size: 10px; opacity: 0.8; text-transform: uppercase;">Alex Mason</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+            </div>
+
+            <!-- Add Bank Form -->
+            <div id="bank-form" class="form-overlay">
+                <div class="form-header">
+                    <h3 class="modal-title">Add Bank Card</h3>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Bank Name</label>
+                    <select class="form-input">
+                        <option>ABA BANK</option>
+                        <option>Canadia Bank</option>
+                        <option>Wing Bank</option>
+                        <option>ACLEDA Bank</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Account Number</label>
+                    <input type="text" class="form-input" placeholder="000 000 000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Account Name (Latin)</label>
+                    <input type="text" class="form-input" placeholder="e.g. ALEX MASON">
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn btn-cancel" style="flex: 1;" onclick="toggleForm('bank-form', false)">Cancel</button>
+                    <button class="modal-btn btn-confirm" style="flex: 1;" onclick="simulateSave('bank-form')">Save Card</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Modal -->
+    <div class="modal-overlay" id="modal-address">
+        <div class="modal-card">
+            <div id="address-list-view">
+                <div class="modal-header">
+                    <h3 class="modal-title">My Addresses</h3>
+                    <button class="modal-btn" style="width: 40px; height: 40px; border-radius: 10px;" onclick="toggleForm('address-form', true)">+</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-order-card" style="padding: 16px; display: flex; align-items: flex-start; gap: 12px;">
+                        <div style="background: #f1f5f9; padding: 10px; border-radius: 10px; color: var(--primary);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 700; margin-bottom: 4px;">Home (Default)</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">No. 123, Street 51, BKK1 Area, Phnom Penh, Cambodia</div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px; font-weight: 600;">Contact: 098 *** 123</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+            </div>
+
+            <!-- Add Address Form -->
+            <div id="address-form" class="form-overlay">
+                <div class="form-header">
+                    <h3 class="modal-title">New Address</h3>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contact Name</label>
+                    <input type="text" class="form-input" placeholder="Recipient Name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" placeholder="000 000 000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Detailed Address</label>
+                    <input type="text" class="form-input" placeholder="Street, Building, Room No.">
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn btn-cancel" style="flex: 1;" onclick="toggleForm('address-form', false)">Cancel</button>
+                    <button class="modal-btn btn-confirm" style="flex: 1;" onclick="simulateSave('address-form')">Save Address</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Bank Add -->
+    <div class="modal-overlay" id="modal-bank-add">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Add Bank Info</h3></div>
+            <div class="modal-body">
+                <div class="input-group"><label>BANK NAME</label><select><option>ABA Bank</option><option>Canadia Bank</option></select></div>
+                <div class="input-group"><label>HOLDER NAME</label><input type="text" placeholder="FULL NAME"></div>
+                <div class="input-group"><label>ACCOUNT NUMBER</label><input type="text" placeholder="000 000 000"></div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-cancel" onclick="openModal('modal-bank')">Cancel</button><button class="modal-btn btn-confirm" onclick="alert('Bank added!'); openModal('modal-bank')">Confirm</button></div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="modal-settings">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Profile Settings</h3></div>
+            <div class="modal-body">
+                <div class="input-group"><label>NICKNAME</label><input type="text" value="Alex Mason"></div>
+                <div class="input-group"><label>PHONE</label><input type="text" value="+855 88231222" readonly style="background:#f0f0f0;"></div>
+                <div class="input-group"><label>BIO</label><input type="text" value="Shopping together is fun!"></div>
+                <button class="modal-btn btn-confirm" style="width: 100%; margin-top: 10px;" onclick="if(confirm('Save changes?')){alert('Updated!'); closeModal();}">Save Changes</button>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-cancel" onclick="closeModal()">Cancel</button></div>
+        </div>
+    </div>
+
+    <!-- Bonus Pool Modal -->
+    <div class="modal-overlay" id="modal-bonus">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Bonus Pool Details</h3></div>
+            <div class="modal-body">
+                <div style="background: #f0f9ff; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 25px; border: 1px solid #bae6fd;">
+                    <div style="font-size: 11px; color: #0369a1; font-weight: 700; text-transform: uppercase;">Total Bonus Pool</div>
+                    <div style="font-size: 32px; font-weight: 800; color: #0c4a6e;">$7.00</div>
+                </div>
+                <div class="list-group">
+                    <div class="list-item" style="cursor: default;">
+                        <div class="list-item-content"><h5>New Customer Reward</h5><p>System Auto-Award</p></div>
+                        <div class="list-item-action">+$2.00</div>
+                    </div>
+                    <div class="list-item" style="cursor: default;">
+                        <div class="list-item-content"><h5>Lucky Draw</h5><p>Event: April Promotion</p></div>
+                        <div class="list-item-action">+$5.00</div>
+                    </div>
+                </div>
+                <div style="margin-top: 25px; padding: 15px; background: #fffbeb; border-radius: 14px; border: 1px solid #fef3c7;">
+                    <p style="font-size: 11px; color: #92400e; line-height: 1.6; font-weight: 600;">
+                        * Note: This amount is a company benefit and cannot be withdrawn directly, but it can be used to deduct group-buying product costs.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" onclick="closeModal()">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Confirmation Modal -->
+    <div class="modal-overlay" id="modal-withdraw-confirm">
+        <div class="modal-card">
+            <div class="modal-header"><h3 class="modal-title">Confirm Withdrawal</h3></div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>Withdrawal Amount (Max: $1,250.80)</label>
+                    <input type="number" id="withdraw-amount" value="1250.80" step="0.01" oninput="updateWithdrawFee()">
+                </div>
+                <div style="background: #f8fafc; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; color: var(--text-secondary);">
+                        <span>Bank Target:</span>
+                        <span id="confirm-bank-name" style="font-weight: 700; color: var(--primary);">ABA BANK</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; color: var(--text-secondary);">
+                        <span>Processing Fee (3%):</span>
+                        <span id="confirm-fee-amount" style="font-weight: 700; color: #ef4444;">-$37.52</span>
+                    </div>
+                    <div style="height: 1px; background: #e2e8f0; margin: 10px 0;"></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 800; color: var(--primary);">
+                        <span>Actual Arrival:</span>
+                        <span id="confirm-final-amount">$1,213.28</span>
+                    </div>
+                </div>
+                <p id="withdraw-error" style="font-size: 11px; color: #ef4444; margin-top: 10px; display: none; font-weight: 600;">* Amount exceeds available balance!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn btn-cancel" onclick="openModal('modal-withdraw-select')">Back</button>
+                <button class="modal-btn btn-confirm" id="btn-start-withdraw" onclick="startWithdrawal()">Confirm Withdrawal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Processing Modal -->
+    <div class="modal-overlay" id="modal-withdraw-processing">
+        <div class="modal-card">
+            <div class="modal-body" style="text-align: center; padding: 60px 20px;">
+                <div class="loading-spinner" style="width: 50px; height: 50px; border: 4px solid #f1f5f9; border-top-color: var(--primary); border-radius: 50%; margin: 0 auto 20px; animation: spin 1s linear infinite;"></div>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--primary);">Processing Request...</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">Please do not close this window</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Success -->
+    <div class="modal-overlay" id="modal-withdraw-success">
+        <div class="modal-card">
+            <div class="modal-body" style="text-align: center; padding: 40px 20px;">
+                <div style="width: 60px; height: 60px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:32px;height:32px;"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <h3 style="font-size: 18px; margin-bottom: 10px;">Withdrawal Successful!</h3>
+                <p style="font-size: 13px; color: var(--text-muted);">Request processed. Funds will arrive within 24 hours.</p>
+            </div>
+            <div class="modal-footer"><button class="modal-btn btn-confirm" style="width: 100%;" onclick="closeModal()">Done</button></div>
+        </div>
+    </div>
+
+    <!-- Placeholder Award Modals -->
+    <div class="modal-overlay" id="modal-direct-award"><div class="modal-card"><div class="modal-header"><h3 class="modal-title">Direct Awards</h3></div><div class="modal-body member-list" id="direct-awards-content"></div><div class="modal-footer"><button class="modal-btn btn-confirm" onclick="openModal('modal-pending')">Back</button></div></div></div>
+    <div class="modal-overlay" id="modal-indirect-award"><div class="modal-card"><div class="modal-header"><h3 class="modal-title">Indirect Awards</h3></div><div class="modal-body member-list" id="indirect-awards-content"></div><div class="modal-footer"><button class="modal-btn btn-confirm" onclick="openModal('modal-pending')">Back</button></div></div></div>
+    <div class="modal-overlay" id="modal-team-award"><div class="modal-card"><div class="modal-header"><h3 class="modal-title">Team Awards</h3></div><div class="modal-body member-list" id="team-awards-content"></div><div class="modal-footer"><button class="modal-btn btn-confirm" onclick="openModal('modal-pending')">Back</button></div></div></div>
+    <div class="modal-overlay" id="modal-global-pool"><div class="modal-card"><div class="modal-header"><h3 class="modal-title">Global Dividend</h3></div><div class="modal-body" id="global-pool-content"></div><div class="modal-footer"><button class="modal-btn btn-confirm" onclick="openModal('modal-pending')">Back</button></div></div></div>
+
+    <script>
+        function openModal(id) {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            const modal = document.getElementById(id);
+            if(modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.form-overlay').forEach(f => f.classList.remove('active'));
+            // Reset visibility for bank/address lists
+            const bankList = document.getElementById('bank-list-view');
+            if(bankList) bankList.style.display = 'block';
+            const addressList = document.getElementById('address-list-view');
+            if(addressList) addressList.style.display = 'block';
+            document.body.style.overflow = '';
+        }
+
+        function switchTeamTab(el, type) {
+            document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.member-list').forEach(l => l.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById(type + '-list').classList.add('active');
+        }
+
+        function toggleForm(formId, show) {
+            const form = document.getElementById(formId);
+            const parentId = formId.split('-')[0];
+            const listView = document.getElementById(parentId + '-list-view');
+            
+            if(show) {
+                form.classList.add('active');
+                listView.style.display = 'none';
+            } else {
+                form.classList.remove('active');
+                listView.style.display = 'block';
+            }
+        }
+
+        function simulateSave(formId) {
+            alert('Information saved successfully!');
+            toggleForm(formId, false);
+        }
+
+        function withdrawConfirm(bank) {
+            document.getElementById('confirm-bank-name').innerText = bank;
+            openModal('modal-withdraw-confirm');
+            updateWithdrawFee();
+        }
+
+        function updateWithdrawFee() {
+            const amountInput = document.getElementById('withdraw-amount');
+            const amount = parseFloat(amountInput.value) || 0;
+            const withdrawable = 1250.80;
+            const fee = (amount * 0.03).toFixed(2);
+            const final = (amount - fee).toFixed(2);
+            
+            document.getElementById('confirm-fee-amount').innerText = '-$' + fee;
+            document.getElementById('confirm-final-amount').innerText = '$' + final;
+            
+            const btnConfirm = document.getElementById('btn-start-withdraw');
+            const errorMsg = document.getElementById('withdraw-error');
+            
+            if(amount > withdrawable || amount <= 0) {
+                btnConfirm.style.opacity = '0.5';
+                btnConfirm.style.pointerEvents = 'none';
+                errorMsg.style.display = 'block';
+            } else {
+                btnConfirm.style.opacity = '1';
+                btnConfirm.style.pointerEvents = 'auto';
+                errorMsg.style.display = 'none';
+            }
+        }
+
+        function startWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const withdrawable = 1250.80;
+            const newWithdrawable = (withdrawable - amount).toLocaleString('en-US', {minimumFractionDigits: 2});
+            
+            openModal('modal-withdraw-processing');
+            
+            setTimeout(() => {
+                // Only decrease the 'Withdrawable' amount
+                document.getElementById('card-withdrawable-balance').innerText = '$' + newWithdrawable;
+                openModal('modal-withdraw-success');
+            }, 1000);
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        });
+    </script>
+</body>
+</html>
