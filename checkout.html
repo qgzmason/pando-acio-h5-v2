@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - pando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #333333;
+            --accent: #ff6b6b;
+            --success: #10b981;
+            --bg-main: #f5f5f5;
+            --bg-light: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border: #e5e5e5;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-primary); padding-bottom: 100px; }
+        
+        .header { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .back-btn { position: absolute; left: 16px; background: none; border: none; font-size: 14px; color: var(--text-primary); cursor: pointer; }
+        .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; }
+        
+        .main-content { margin-top: 56px; padding: 16px; }
+        
+        .section { background: var(--bg-card); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+        .section-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+        
+        .address-card { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; cursor: pointer; }
+        .address-card.selected { border-color: var(--primary); background: var(--bg-light); }
+        .address-card input { margin-top: 2px; }
+        .address-info { flex: 1; }
+        .address-info .name { font-weight: 500; margin-bottom: 4px; }
+        .address-info .phone { color: var(--text-muted); font-size: 13px; margin-left: 8px; }
+        .address-info .address { font-size: 13px; color: var(--text-secondary); }
+        .add-btn { width: 100%; padding: 12px; border: 2px dashed var(--border); border-radius: 8px; background: none; color: var(--text-secondary); font-size: 14px; cursor: pointer; }
+        
+        .order-item { display: flex; gap: 12px; }
+        .order-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+        .order-info { flex: 1; }
+        .order-info .name { font-weight: 500; margin-bottom: 4px; }
+        .order-info .price { font-size: 16px; font-weight: 600; color: var(--primary); }
+        .quantity { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+        .qty-btn { width: 28px; height: 28px; border: 1px solid var(--border); background: var(--bg-light); border-radius: 4px; cursor: pointer; }
+        .qty-num { font-weight: 500; }
+        
+        .payment-option { display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
+        .payment-option.selected { border-color: var(--primary); background: var(--bg-light); }
+        .payment-icon { font-size: 20px; }
+        
+        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; color: var(--text-secondary); }
+        .summary-row.total { font-size: 18px; font-weight: 600; color: var(--text-primary); border-top: 1px solid var(--border); margin-top: 8px; padding-top: 16px; }
+        
+        .checkout-footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-card); border-top: 1px solid var(--border); padding: 16px; }
+        .pay-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .pay-btn:hover { background: var(--secondary); }
+        
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-card); border-radius: 16px; width: 100%; max-width: 340px; padding: 32px 24px; text-align: center; position: relative; animation: popIn 0.3s ease; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-icon { font-size: 64px; margin-bottom: 16px; }
+        .modal h2 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; margin-bottom: 8px; }
+        .modal p { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
+        .modal-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
+        .modal-btn:hover { background: var(--secondary); }
+        .modal-btn.secondary { background: var(--bg-light); color: var(--text-primary); }
+        
+        /* Share Modal */
+        .share-link-box { background: var(--bg-light); border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .share-link-box input { flex: 1; border: none; background: none; font-size: 12px; color: var(--text-primary); outline: none; }
+        .copy-btn { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+        .copy-btn:hover { background: var(--secondary); }
+        .share-buttons { display: flex; justify-content: center; gap: 16px; margin-top: 20px; }
+        .share-btn { width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+        .share-btn:hover { transform: scale(1.1); }
+        .share-btn.telegram { background: #0088cc; }
+        .share-btn.facebook { background: #1877f2; }
+        .share-btn.tiktok { background: #000000; }
+        .share-btn.x { background: #000000; }
+        .share-btn svg { width: 24px; height: 24px; fill: white; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="back-btn" onclick="history.back()">← Back</button>
+        <span class="header-title">CHECKOUT</span>
+    </header>
+    
+    <main class="main-content">
+        <section class="section">
+            <h3 class="section-title">Shipping Address</h3>
+            <div class="address-card selected">
+                <input type="radio" name="address" checked>
+                <div class="address-info">
+                    <p class="name">John Doe <span class="phone">+1 234 567 890</span></p>
+                    <p class="address">123 Main Street, Apt 4B, New York, NY 10001</p>
+                </div>
+            </div>
+            <div class="address-card">
+                <input type="radio" name="address">
+                <div class="address-info">
+                    <p class="name">John Doe <span class="phone">+1 234 567 890</span></p>
+                    <p class="address">456 Oak Avenue, Los Angeles, CA 90001</p>
+                </div>
+            </div>
+            <button class="add-btn">+ Add New Address</button>
+        </section>
+        
+        <section class="section">
+            <h3 class="section-title">Order Details</h3>
+            <div class="order-item">
+                <img src="https://picsum.photos/seed/product1/160/160" alt="Product">
+                <div class="order-info">
+                    <p class="name">iPhone 15 Pro Max 256GB</p>
+                    <p class="price">$899.00</p>
+                    <div class="quantity">
+                        <button class="qty-btn">−</button>
+                        <span class="qty-num">1</span>
+                        <button class="qty-btn">+</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h3 class="section-title">Payment Method</h3>
+            <div class="payment-option selected">
+                <input type="radio" name="payment" checked>
+                <span class="payment-icon">💳</span>
+                <span>Credit Card</span>
+            </div>
+            <div class="payment-option">
+                <input type="radio" name="payment">
+                <span class="payment-icon">🅿️</span>
+                <span>PayPal</span>
+            </div>
+            <div class="payment-option">
+                <input type="radio" name="payment">
+                <span class="payment-icon">📱</span>
+                <span>Apple Pay</span>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h3 class="section-title">Order Summary</h3>
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>$899.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span>FREE</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>$899.00</span>
+            </div>
+        </section>
+    </main>
+    
+    <div class="checkout-footer">
+        <button class="pay-btn" onclick="processPayment()">Pay Now - $899.00</button>
+    </div>
+    
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal">
+            <div class="modal-icon">✅</div>
+            <h2>Payment Successful!</h2>
+            <p>Your order has been placed successfully. Share with friends to get more rewards!</p>
+            <button class="modal-btn" onclick="openShareModal()">Share Now</button>
+            <button class="modal-btn secondary" onclick="goToOrders()">View Orders</button>
+        </div>
+    </div>
+    
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="shareModal">
+        <div class="modal">
+            <div class="modal-icon">🎁</div>
+            <h2>Share & Earn</h2>
+            <p>Share your exclusive link and earn rewards when friends join!</p>
+            <div class="share-link-box">
+                <input type="text" id="shareLink" value="https://pando.com/ref/USER2026ABC123" readonly>
+                <button class="copy-btn" onclick="copyLink()">Copy</button>
+            </div>
+            <div class="share-buttons">
+                <button class="share-btn telegram" onclick="shareTo('telegram')" title="Telegram">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+                </button>
+                <button class="share-btn facebook" onclick="shareTo('facebook')" title="Facebook">
+                    <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </button>
+                <button class="share-btn tiktok" onclick="shareTo('tiktok')" title="TikTok">
+                    <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                </button>
+                <button class="share-btn x" onclick="shareTo('x')" title="X (Twitter)">
+                    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </button>
+            </div>
+            <button class="modal-btn secondary" style="margin-top:20px;" onclick="closeShareModal()">Done</button>
+        </div>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.address-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input').checked = true;
+            });
+        });
+        
+        document.querySelectorAll('.payment-option').forEach(opt => {
+            opt.addEventListener('click', function() {
+                document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input').checked = true;
+            });
+        });
+        
+        function processPayment() {
+            // Show loading
+            document.querySelector('.pay-btn').textContent = 'Processing...';
+            setTimeout(() => {
+                document.querySelector('.pay-btn').textContent = 'Pay Now - $899.00';
+                document.getElementById('successModal').classList.add('active');
+            }, 1500);
+        }
+        
+        function openShareModal() {
+            document.getElementById('successModal').classList.remove('active');
+            // Generate unique share link
+            const refCode = 'USER' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            document.getElementById('shareLink').value = 'https://pando.com/ref/' + refCode;
+            document.getElementById('shareModal').classList.add('active');
+        }
+        
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+        
+        function goToOrders() {
+            window.location.href = 'orders.html';
+        }
+        
+        function copyLink() {
+            const linkInput = document.getElementById('shareLink');
+            linkInput.select();
+            document.execCommand('copy');
+            
+            const copyBtn = document.querySelector('.copy-btn');
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy';
+            }, 2000);
+        }
+        
+        function shareTo(platform) {
+            const shareLink = document.getElementById('shareLink').value;
+            const shareText = 'Join Pando and get amazing deals! Use my referral link: ';
+            let url = '';
+            
+            switch(platform) {
+                case 'telegram':
+                    url = 'https://t.me/share/url?url=' + encodeURIComponent(shareLink) + '&text=' + encodeURIComponent(shareText);
+                    break;
+                case 'facebook':
+                    url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareLink);
+                    break;
+                case 'tiktok':
+                    // TikTok doesn't have a direct share URL, show alert
+                    alert('Opening TikTok app... Share your link: ' + shareLink);
+                    return;
+                case 'x':
+                    url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) + '&url=' + encodeURIComponent(shareLink);
+                    break;
+            }
+            
+            if (url) {
+                window.open(url, '_blank', 'width=600,height=400');
+            }
+        }
+        
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
