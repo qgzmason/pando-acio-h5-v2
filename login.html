@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - pando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #333333;
+            --accent: #ff6b6b;
+            --success: #10b981;
+            --bg-main: #ffffff;
+            --bg-light: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border: #e5e5e5;
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .header { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .logo { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--primary); letter-spacing: 3px; text-decoration: none; }
+        
+        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; margin-top: 56px; }
+        .login-container { width: 100%; max-width: 360px; }
+        
+        .login-header { text-align: center; margin-bottom: 32px; }
+        .login-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; margin-bottom: 8px; }
+        .login-header p { font-size: 14px; color: var(--text-secondary); }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+        .form-group input { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: var(--transition); }
+        .form-group input:focus { border-color: var(--primary); }
+        
+        .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 13px; }
+        .remember-me { display: flex; align-items: center; gap: 8px; }
+        .remember-me input { width: 16px; height: 16px; }
+        .forgot-password { color: var(--accent); text-decoration: none; }
+        
+        .login-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: var(--transition); margin-bottom: 16px; }
+        .login-btn:hover { background: var(--secondary); }
+        
+        .social-login { text-align: center; margin-bottom: 24px; }
+        .social-login p { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; position: relative; }
+        .social-login p::before, .social-login p::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: var(--border); }
+        .social-login p::before { left: 0; }
+        .social-login p::after { right: 0; }
+        
+        .social-buttons { display: flex; gap: 12px; }
+        .social-btn { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: none; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); }
+        .social-btn:hover { background: var(--bg-light); }
+        
+        .register-link { text-align: center; font-size: 14px; }
+        .register-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        
+        .bonus-banner { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 24px; text-align: center; }
+        .bonus-banner h3 { font-size: 18px; margin-bottom: 4px; }
+        .bonus-banner p { font-size: 24px; font-weight: 700; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: var(--text-muted); padding: 8px 12px; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item svg { width: 22px; height: 22px; }
+        .nav-item span { font-size: 10px; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="logo">pando</a>
+    </header>
+    
+    <main class="main-content">
+        <div class="login-container">
+            <div class="bonus-banner">
+                <h3>New User Bonus</h3>
+                <p>$2.00</p>
+            </div>
+            
+            <div class="login-header">
+                <h1>Welcome Back</h1>
+                <p>Login to continue and claim your reward</p>
+            </div>
+            
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            
+            <div class="social-login">
+                <p>or continue with</p>
+                <div class="social-buttons">
+                    <button class="social-btn" onclick="socialLogin('google')">
+                        <span>G</span> Google
+                    </button>
+                    <button class="social-btn" onclick="socialLogin('facebook')">
+                        <span>f</span> Facebook
+                    </button>
+                </div>
+            </div>
+            
+            <p class="register-link">Don't have an account? <a href="#" onclick="showRegister()">Sign up</a></p>
+        </div>
+    </main>
+    
+    <div id="registerModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:var(--bg-card);border-radius:16px;padding:32px 24px;width:100%;max-width:360px;text-align:center;position:relative;">
+            <button onclick="closeRegister()" style="position:absolute;top:12px;right:12px;width:28px;height:28px;border:none;background:var(--bg-light);border-radius:50%;cursor:pointer;font-size:16px;">×</button>
+            <h2 style="font-family:'Bebas Neue',sans-serif;font-size:28px;margin-bottom:8px;">Create Account</h2>
+            <p style="font-size:14px;color:var(--text-secondary);margin-bottom:24px;">Join and get $2.00 bonus!</p>
+            
+            <form onsubmit="handleRegister(event)">
+                <div style="margin-bottom:16px;">
+                    <input type="text" placeholder="Full Name" required style="width:100%;padding:14px 16px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <input type="email" placeholder="Email" required style="width:100%;padding:14px 16px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                </div>
+                <div style="margin-bottom:16px;">
+                    <input type="password" placeholder="Password" required style="width:100%;padding:14px 16px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                </div>
+                <div style="margin-bottom:20px;">
+                    <input type="password" placeholder="Confirm Password" required style="width:100%;padding:14px 16px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                </div>
+                <button type="submit" style="width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">Sign Up</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Check for register action on load
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('action') === 'register') {
+                showRegister();
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simulate login
+            alert('Login successful! Welcome back!');
+            window.location.href = 'profile.html';
+        }
+        
+        function handleRegister(e) {
+            e.preventDefault();
+            alert('Registration successful! You got $2.00 bonus!');
+            window.location.href = 'profile.html';
+        }
+        
+        function socialLogin(provider) {
+            alert('Logging in with ' + provider + '...');
+            window.location.href = 'profile.html';
+        }
+        
+        function showRegister() {
+            document.getElementById('registerModal').style.display = 'flex';
+        }
+        
+        function closeRegister() {
+            document.getElementById('registerModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
