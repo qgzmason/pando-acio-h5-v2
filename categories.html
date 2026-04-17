@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - PANDO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #333333;
+            --accent: #ff6b6b;
+            --success: #10b981;
+            --bg-main: #ffffff;
+            --bg-light: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border: #e5e5e5;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-primary); padding-bottom: 70px; }
+        
+        .header { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 1000; }
+        .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .logo-icon span { color: white; font-family: 'Bebas Neue', sans-serif; font-size: 22px; font-weight: 500; }
+        .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--primary); letter-spacing: 3px; }
+        .header-center { flex: 1; display: flex; justify-content: center; padding: 0 16px; }
+        .search-icon { width: 24px; height: 24px; cursor: pointer; color: var(--text-primary); }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+        
+        .main-content { margin-top: 56px; }
+        .banner { background: linear-gradient(135deg, #f3e7e9 0%, #e3eeff 100%); padding: 32px 20px; text-align: center; min-height: 180px; display: flex; align-items: center; justify-content: center; }
+        .banner h1 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--primary); letter-spacing: 1px; }
+        
+        .page-layout { display: flex; }
+        .sidebar { width: 85px; background: var(--bg-light); padding: 12px 8px; position: sticky; top: 56px; height: calc(100vh - 126px); overflow-y: auto; }
+        .category-item { padding: 12px 8px; font-size: 11px; font-weight: 500; color: var(--text-secondary); cursor: pointer; text-align: center; border-radius: 8px; margin-bottom: 4px; transition: var(--transition); }
+        .category-item:hover { background: var(--bg-card); }
+        .category-item.active { background: var(--primary); color: white; }
+        
+        .products-area { flex: 1; padding: 16px; }
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: var(--transition); cursor: pointer; }
+        .product-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .product-image { position: relative; width: 100%; height: 120px; }
+        .product-image img { width: 100%; height: 100%; object-fit: cover; }
+        .compensation-badge { position: absolute; top: 8px; left: 8px; background: var(--success); color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .product-body { padding: 10px; }
+        .product-title { font-size: 12px; font-weight: 500; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 34px; color: var(--text-primary); line-height: 1.4; }
+        .product-prices { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
+        .product-price { font-size: 16px; font-weight: 700; color: var(--primary); }
+        .product-original { font-size: 12px; color: var(--text-muted); text-decoration: line-through; }
+        .product-info { display: flex; justify-content: space-between; align-items: center; }
+        .group-size { font-size: 11px; color: var(--text-muted); }
+        .product-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; margin-top: 8px; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: var(--text-muted); padding: 8px 12px; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item svg { width: 22px; height: 22px; }
+        .nav-item span { font-size: 10px; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="logo">
+            <div class="logo-icon"><span>P</span></div>
+            <span class="logo-text">PANDO</span>
+        </a>
+        <div class="header-center">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+        </div>
+        <div class="header-right"></div>
+    </header>
+    
+    <main class="main-content">
+        <section class="banner">
+            <h1>Browse by Category</h1>
+        </section>
+        
+        <div class="page-layout">
+            <aside class="sidebar" id="categorySidebar"></aside>
+            <div class="products-area">
+                <div class="products-grid" id="productsGrid"></div>
+            </div>
+        </div>
+    </main>
+    
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="categories.html" class="nav-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Categories</span>
+        </a>
+        <a href="discover.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+            <span>Discover</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Orders</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Me</span>
+        </a>
+    </nav>
+
+    <script>
+        var categories = ['Apparel', 'Beauty', 'Phones', 'Digital', 'Home', 'Shoes', 'Baby', 'Food', 'Bags', 'Connect', 'Jewelry'];
+        var productsByCategory = {
+            Apparel: [
+                { id: 2, name: 'Nike Air Max 90', price: 79, original: 130, compensation: 12, groupSize: 5, img: 'images/Nike Air Max 90.png' },
+                { id: 22, name: 'Adidas Ultraboost 22', price: 99, original: 180, compensation: 15, groupSize: 5, img: 'images/Adidas.png' },
+                { id: 27, name: "Levi's 501 Original Jeans", price: 49, original: 79, compensation: 8, groupSize: 10 },
+                { id: 33, name: 'Under Armour Curry 10', price: 139, original: 180, compensation: 16, groupSize: 3 }
+            ],
+            Beauty: [
+                { id: 16, name: 'Dyson Airwrap Complete', price: 399, original: 549, compensation: 18, groupSize: 4 }
+            ],
+            Phones: [
+                { id: 1, name: 'iPhone 15 Pro Max 256GB', price: 899, original: 1199, compensation: 35, groupSize: 5, img: 'images/iPhone 15 Pro Max 256GB.png' },
+                { id: 3, name: 'Samsung Galaxy S24 Ultra', price: 799, original: 1099, compensation: 28, groupSize: 5, img: 'images/Samsung Galaxy S24 Ultra.png' },
+                { id: 21, name: 'Apple iPhone 15 128GB', price: 599, original: 799, compensation: 22, groupSize: 3 }
+            ],
+            Digital: [
+                { id: 6, name: 'Apple Watch Series 9', price: 299, original: 429, compensation: 18, groupSize: 4 },
+                { id: 7, name: 'Sony WH-1000XM5', price: 249, original: 399, compensation: 15, groupSize: 5 },
+                { id: 8, name: 'iPad Pro 12.9"', price: 799, original: 1099, compensation: 25, groupSize: 3 },
+                { id: 9, name: 'AirPods Pro 2nd Gen', price: 179, original: 249, compensation: 10, groupSize: 8 },
+                { id: 10, name: 'Nintendo Switch OLED', price: 279, original: 349, compensation: 14, groupSize: 5 },
+                { id: 11, name: 'PS5 Console Bundle', price: 449, original: 549, compensation: 20, groupSize: 4, img: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80' }
+            ],
+            Home: [
+                { id: 4, name: 'Dyson V15 Detect', price: 399, original: 599, compensation: 22, groupSize: 4, img: 'images/Dyson V15 Detect.png' },
+                { id: 14, name: 'Samsung 65" OLED TV', price: 1299, original: 1799, compensation: 38, groupSize: 3 },
+                { id: 28, name: 'Dyson Pure Cool', price: 349, original: 499, compensation: 20, groupSize: 4 },
+                { id: 30, name: 'Instant Pot Duo 7-in-1', price: 79, original: 99, compensation: 8, groupSize: 6 }
+            ],
+            Shoes: [
+                { id: 2, name: 'Nike Air Max 90', price: 79, original: 130, compensation: 12, groupSize: 5, img: 'images/Nike Air Max 90.png' },
+                { id: 22, name: 'Adidas Ultraboost 22', price: 99, original: 180, compensation: 15, groupSize: 5, img: 'images/Adidas.png' }
+            ],
+            Baby: [
+                { id: 31, name: 'Baby Monitor Pro', price: 129, original: 199, compensation: 15, groupSize: 5 }
+            ],
+            Food: [
+                { id: 29, name: 'Premium Coffee Set', price: 49, original: 89, compensation: 8, groupSize: 8 }
+            ],
+            Bags: [
+                { id: 34, name: 'Premium Backpack', price: 89, original: 149, compensation: 12, groupSize: 6 }
+            ],
+            Jewelry: [
+                { id: 20, name: 'Rolex Submariner Date', price: 8999, original: 10100, compensation: 40, groupSize: 5 },
+                { id: 40, name: 'Tiffany & Co. Silver Bracelet', price: 150, original: 200, compensation: 18, groupSize: 5 }
+            ]
+        };
+        
+        var currentCategory = 'Apparel';
+        
+        function renderSidebar() {
+            var sidebar = document.getElementById('categorySidebar');
+            var html = '';
+            for (var i = 0; i < categories.length; i++) {
+                var c = categories[i];
+                var active = c === currentCategory ? ' active' : '';
+                html += '<div class="category-item' + active + '" onclick="selectCat(\'' + c + '\')">' + c + '</div>';
+            }
+            sidebar.innerHTML = html;
+        }
+        
+        function renderProducts() {
+            var grid = document.getElementById('productsGrid');
+            var products = productsByCategory[currentCategory];
+            if (!products || products.length === 0) {
+                grid.innerHTML = '<div style="padding:20px;text-align:center;">No products</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                var img = p.img || 'https://picsum.photos/seed/product' + p.id + '/400/300';
+                html += '<div class="product-card" onclick="location.href=\'product-detail.html?id=' + p.id + '\'">';
+                html += '<div class="product-image"><img src="' + img + '"><div class="compensation-badge">+$' + p.compensation + '</div></div>';
+                html += '<div class="product-body"><div class="product-title">' + p.name + '</div>';
+                html += '<div class="product-prices"><span class="product-price">$' + p.price + '</span><span class="product-original">$' + p.original + '</span></div>';
+                html += '<div class="product-info"><span class="group-size">' + p.groupSize + ' people</span></div>';
+                html += '<button class="product-btn">Start Group</button></div></div>';
+            }
+            grid.innerHTML = html;
+        }
+        
+        function selectCat(cat) {
+            currentCategory = cat;
+            renderSidebar();
+            renderProducts();
+        }
+        
+        // Init
+        var params = new URLSearchParams(window.location.search);
+        var catParam = params.get('cat');
+        if (catParam && categories.indexOf(catParam) !== -1) {
+            currentCategory = catParam;
+        }
+        renderSidebar();
+        renderProducts();
+    </script>
+</body>
+</html>
