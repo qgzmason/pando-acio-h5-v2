@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Active Groups - pando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #333333;
+            --accent: #ff6b6b;
+            --success: #10b981;
+            --bg-main: #ffffff;
+            --bg-light: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border: #e5e5e5;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            padding-top: 56px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 1000;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            color: var(--primary);
+            letter-spacing: 1px;
+            flex: 1;
+        }
+
+        /* List Styling */
+        .groups-list {
+            padding: 16px;
+        }
+
+        .join-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .join-card:active {
+            transform: scale(0.98);
+        }
+
+        .join-card-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+        .join-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .join-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        .join-card-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .join-card-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .join-card-original {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .progress-container {
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-light);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .progress-text {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .join-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .compensation-tag {
+            font-size: 10px;
+            color: #c0392b;
+            background: rgba(192, 57, 43, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-top: 4px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="back-btn" onclick="history.back()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <h1 class="header-title">Active Groups</h1>
+    </header>
+
+    <main class="groups-list" id="groupsContainer">
+        <!-- Rendered by JS -->
+    </main>
+
+    <script>
+        const activeGroups = [
+            { id: 1, title: "iPhone 15 Pro, 256GB, Natural Titanium", price: 899, original: 1199, progress: 85, left: 3, image: "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=400" },
+            { id: 2, title: "Sony WH-1000XM5 Noise Cancelling Headphones", price: 299, original: 399, progress: 60, left: 2, image: "https://images.unsplash.com/photo-1618366712277-70f398a58221?w=400" },
+            { id: 3, title: "Nike Air Force 1 '07 - Triple White", price: 65, original: 110, progress: 92, left: 1, image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400" },
+            { id: 4, title: "Dyson V15 Detect Cordless Vacuum", price: 450, original: 749, progress: 40, left: 6, image: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=400" },
+            { id: 5, title: "Samsung 55\" QLED 4K Smart TV", price: 699, original: 999, progress: 75, left: 5, image: "https://images.unsplash.com/photo-1593359677777-a412dec20d18?w=400" },
+            { id: 6, title: "MacBook Air M2, 8GB RAM, 256GB SSD", price: 849, original: 1099, progress: 50, left: 10, image: "https://images.unsplash.com/photo-1611186871348-b1ec696e52c9?w=400" }
+        ];
+
+        function renderGroups() {
+            const container = document.getElementById('groupsContainer');
+            container.innerHTML = activeGroups.map(group => `
+                <div class="join-card" onclick="location.href='join-detail.html?id=${group.id}'">
+                    <img src="${group.image}" alt="${group.title}" class="join-card-img">
+                    <div class="join-card-content">
+                        <div>
+                            <h3 class="join-card-title">${group.title}</h3>
+                            <div class="join-card-price-row">
+                                <span class="join-card-price">$${group.price}</span>
+                                <span class="join-card-original">$${group.original}</span>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${group.progress}%"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span>${group.progress}% Filled</span>
+                                    <span>${group.left} Left</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="join-btn">Join Now</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        renderGroups();
+    </script>
+</body>
+</html>
