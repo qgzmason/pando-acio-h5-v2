@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pando - My Orders</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --accent: #ff4d4d;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1a1a1a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border: #f1f5f9;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.02);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); line-height: 1.5; padding-bottom: 90px; }
+
+        /* Header */
+        .header { background: white; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+        .back-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--text-main); text-decoration: none; }
+        .header-title { font-size: 17px; font-weight: 800; }
+        .header-right { width: 40px; }
+
+        /* Tabs */
+        .tab-bar { background: white; display: flex; justify-content: space-around; padding: 0 4px; border-bottom: 1px solid var(--border); position: sticky; top: 60px; z-index: 99; }
+        .tab { padding: 14px 12px; font-size: 13px; font-weight: 700; color: var(--text-muted); position: relative; cursor: pointer; transition: var(--transition); }
+        .tab.active { color: var(--primary); }
+        .tab.active::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 3px; background: var(--primary); border-radius: 10px; }
+
+        /* Order List */
+        .order-container { padding: 16px; }
+        .order-card { background: white; border-radius: 20px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+        
+        .order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px dashed #f1f5f9; }
+        .order-time { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .order-status-tag { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-win { color: var(--success); }
+        .status-compensated { color: var(--accent); }
+        .status-matching { color: var(--warning); }
+        .status-pending { color: var(--text-secondary); }
+
+        .order-main { display: flex; gap: 12px; margin-bottom: 14px; }
+        .prod-img { width: 84px; height: 84px; border-radius: 14px; object-fit: cover; background: #f8fafc; }
+        .prod-info { flex: 1; min-width: 0; }
+        .prod-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .prod-price { font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+        
+        /* Pando Logic Display */
+        .pando-logic-box { background: #f8fafc; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border: 1px solid #f1f5f9; }
+        .logic-label { font-size: 10px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+        .logic-val { font-size: 13px; font-weight: 800; color: var(--primary); }
+        .win-badge { background: var(--success); color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+        .comp-badge { background: var(--accent); color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+
+        .order-bottom { display: flex; justify-content: flex-end; gap: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+        .btn-outline { padding: 8px 16px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 12px; font-weight: 700; color: var(--text-secondary); background: none; }
+        .btn-filled { padding: 8px 16px; border-radius: 10px; border: none; font-size: 12px; font-weight: 800; color: white; background: var(--primary); }
+
+        /* Empty State */
+        .empty-state { padding: 100px 40px; text-align: center; display: none; }
+        .empty-icon { width: 64px; height: 64px; margin: 0 auto 16px; color: #e2e8f0; }
+        .empty-text { font-size: 14px; font-weight: 700; color: var(--text-muted); }
+
+        /* Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); text-decoration: none; transition: var(--transition); }
+        .nav-item.active { color: var(--primary); }
+        .nav-item svg { width: 24px; height: 24px; stroke-width: 2.2px; }
+        .nav-item span { font-size: 11px; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="profile.html" class="back-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:20px;height:20px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></a>
+        <h1 class="header-title">My Orders</h1>
+        <div class="header-right"></div>
+    </header>
+
+    <div class="tab-bar">
+        <div class="tab" onclick="switchTab('all')" id="tab-all">All</div>
+        <div class="tab" onclick="switchTab('pay')" id="tab-pay">To Pay</div>
+        <div class="tab" onclick="switchTab('receive')" id="tab-receive">To Receive</div>
+        <div class="tab" onclick="switchTab('rate')" id="tab-rate">To Rate</div>
+        <div class="tab" onclick="switchTab('service')" id="tab-service">Aftersales</div>
+    </div>
+
+    <div class="order-container" id="orderList">
+        <!-- Order Card: To Pay -->
+        <div class="order-card order-item-pay">
+            <div class="order-top">
+                <span class="order-time">2024-04-14 12:00</span>
+                <span class="order-status-tag status-pending">Waiting for Payment</span>
+            </div>
+            <div class="order-main">
+                <img src="https://images.unsplash.com/photo-1523206489230-c012c745c25f?w=200" class="prod-img" alt="">
+                <div class="prod-info">
+                    <p class="prod-name">Smartphone 12 Pro Max - 256GB</p>
+                    <p class="prod-price">$999.00</p>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Qty: 1</div>
+                </div>
+            </div>
+            <div class="order-bottom">
+                <button class="btn-outline">Cancel</button>
+                <button class="btn-filled" style="background: var(--accent);">Pay Now</button>
+            </div>
+        </div>
+
+        <!-- Order Card: Matching (To Receive) -->
+        <div class="order-card order-item-receive">
+            <div class="order-top">
+                <span class="order-time">2024-04-14 10:20</span>
+                <span class="order-status-tag status-matching">Matching...</span>
+            </div>
+            <div class="order-main">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200" class="prod-img" alt="">
+                <div class="prod-info">
+                    <p class="prod-name">Classic White Watch - 42mm Silver Edition</p>
+                    <p class="prod-price">$120.00</p>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Qty: 1</div>
+                </div>
+            </div>
+            <div class="pando-logic-box">
+                <div>
+                    <div class="logic-label">Group Progress</div>
+                    <div class="logic-val">4/5 Members</div>
+                </div>
+                <div>
+                    <div class="logic-label">Potential Income</div>
+                    <div class="logic-val" style="color: var(--accent);">+$12.00</div>
+                </div>
+            </div>
+            <div class="order-bottom">
+                <button class="btn-outline">Invite Friends</button>
+                <button class="btn-filled">Details</button>
+            </div>
+        </div>
+
+        <!-- Order Card: Completed (Winner) -> To Rate -->
+        <div class="order-card order-item-rate">
+            <div class="order-top">
+                <span class="order-time">2024-04-12 15:45</span>
+                <span class="order-status-tag status-win">Order Win <span class="win-badge">WINNER</span></span>
+            </div>
+            <div class="order-main">
+                <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200" class="prod-img" alt="">
+                <div class="prod-info">
+                    <p class="prod-name">Wireless Noise Cancelling Headphones</p>
+                    <p class="prod-price">$89.00</p>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Qty: 1</div>
+                </div>
+            </div>
+            <div class="pando-logic-box" style="background: #f0fdf4; border-color: #dcfce7;">
+                <div>
+                    <div class="logic-label">Group Result</div>
+                    <div class="logic-val" style="color: var(--success);">Lucky Winner</div>
+                </div>
+                <div>
+                    <div class="logic-label">Shipment</div>
+                    <div class="logic-val">Delivered</div>
+                </div>
+            </div>
+            <div class="order-bottom">
+                <button class="btn-outline">Track</button>
+                <button class="btn-filled" style="background: var(--success);">To Rate</button>
+            </div>
+        </div>
+
+        <!-- Order Card: Aftersales -->
+        <div class="order-card order-item-service">
+            <div class="order-top">
+                <span class="order-time">2024-04-10 14:30</span>
+                <span class="order-status-tag" style="color: var(--text-muted);">Aftersales Pending</span>
+            </div>
+            <div class="order-main">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200" class="prod-img" alt="">
+                <div class="prod-info">
+                    <p class="prod-name">Nike Sport Shoes Red Edition</p>
+                    <p class="prod-price">$65.00</p>
+                </div>
+            </div>
+            <div class="order-bottom">
+                <button class="btn-outline" style="width: 100%;">Contact Support</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <p class="empty-text">No orders found in this category.</p>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></a>
+        <a href="categories.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>Categories</span></a>
+        <a href="discover.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg><span>Discover</span></a>
+        <a href="orders.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Orders</span></a>
+        <a href="profile.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Me</span></a>
+    </nav>
+
+    <script>
+        function switchTab(tab) {
+            // Update UI
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+
+            // Filter logic
+            const items = document.querySelectorAll('.order-card');
+            let found = false;
+            items.forEach(item => {
+                if (tab === 'all') {
+                    item.style.display = 'block';
+                    found = true;
+                } else {
+                    if (item.classList.contains('order-item-' + tab)) {
+                        item.style.display = 'block';
+                        found = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+
+            document.getElementById('emptyState').style.display = found ? 'none' : 'block';
+        }
+
+        // Initialize based on URL parameter
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab') || 'all';
+            switchTab(tab);
+        };
+    </script>
+</body>
+</html>
