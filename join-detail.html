@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Join Group - pando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a0a0a;
+            --secondary: #1a1a1a;
+            --accent: #ff4757;
+            --gold: #f1c40f;
+            --gold-gradient: linear-gradient(135deg, #f1c40f 0%, #d35400 100%);
+            --neon-red: #ff003c;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding-bottom: 140px; }
+        
+        /* Header */
+        .header { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: var(--secondary); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 1000; }
+        .back-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: white; }
+        .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; }
+        .accel-link { font-size: 11px; font-weight: 800; color: var(--gold); text-decoration: none; border: 1.5px solid var(--gold); padding: 4px 10px; border-radius: 20px; }
+
+        /* Product Hero */
+        .hero { position: relative; width: 100%; height: 320px; background: #000; overflow: hidden; }
+        .hero img { width: 100%; height: 100%; object-fit: contain; }
+        .compensation-tag { position: absolute; bottom: 20px; right: 20px; background: var(--success); color: white; padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 22px; box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4); }
+        .status-badge { position: absolute; top: 20px; left: 20px; background: var(--neon-red); color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 1px; }
+        .timer-badge { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; border: 1px solid var(--border); backdrop-filter: blur(5px); }
+
+        /* Content */
+        .content { padding: 24px 20px; }
+        .price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+        .current-price { font-size: 40px; font-weight: 900; font-family: 'Bebas Neue', sans-serif; color: white; }
+        .original-price { font-size: 18px; color: #666; text-decoration: line-through; }
+        .product-title { font-size: 20px; font-weight: 800; line-height: 1.3; margin-bottom: 20px; color: #eee; }
+
+        /* Outcome Table - NEW: Comprehensive Comparison */
+        .outcome-card { 
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(10, 10, 10, 1) 100%); 
+            border: 1px solid #10b981; 
+            border-radius: 20px; 
+            padding: 24px; 
+            margin-bottom: 35px; 
+        }
+        .outcome-title { font-size: 15px; font-weight: 900; color: #10b981; margin-bottom: 20px; letter-spacing: 0.5px; border-bottom: 1px solid rgba(16,185,129,0.2); padding-bottom: 12px; }
+        .outcome-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 18px; }
+        .outcome-item:last-child { margin-bottom: 0; }
+        .outcome-icon { font-size: 24px; line-height: 1; margin-top: 2px; }
+        .outcome-text h4 { font-size: 14px; font-weight: 800; margin-bottom: 4px; color: #fff; }
+        .outcome-text p { font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+        .outcome-text strong { color: #fff; font-weight: 800; }
+
+        /* DETAILED EARNINGS STIMULUS CARD */
+        .stimulus-card { background: var(--secondary); border-radius: 24px; padding: 25px; margin-bottom: 25px; border: 1.5px solid var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
+        .card-label { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--gold); margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; }
+        .card-label span { background: var(--neon-red); color: white; font-size: 9px; padding: 2px 8px; border-radius: 4px; font-family: 'Inter'; }
+        
+        .unit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .unit-box { background: var(--glass); padding: 15px; border-radius: 16px; text-align: center; border: 1px solid var(--border); }
+        .u-label { font-size: 10px; color: #888; text-transform: uppercase; font-weight: 700; margin-bottom: 5px; }
+        .u-val { font-size: 22px; font-weight: 900; color: white; }
+        .u-val small { font-size: 12px; color: var(--gold); margin-right: 2px; }
+
+        .breakdown { border-top: 1px solid var(--border); padding-top: 20px; }
+        .breakdown-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
+        .b-label { color: #aaa; }
+        .b-val { font-weight: 800; color: white; }
+        .b-val span { color: var(--gold); margin-left: 5px; }
+
+        .total-lock-box { background: var(--gold-gradient); color: black; border-radius: 15px; padding: 18px; display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .total-lock-box h5 { font-size: 11px; font-weight: 900; text-transform: uppercase; }
+        .total-lock-box .val { font-size: 32px; font-family: 'Bebas Neue', sans-serif; }
+
+        /* Progress Section - OVAL STYLE + DYNAMIC SHIMMER (RESTORED) */
+        .progress-box { background: #111; border-radius: 28px; padding: 28px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
+        .p-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .p-title { font-size: 13px; font-weight: 800; color: #888; letter-spacing: 1.5px; text-transform: uppercase; }
+        .p-urgency { 
+            background: #ff003c; 
+            color: white; 
+            font-size: 11px; 
+            padding: 8px 16px; 
+            border-radius: 10px; 
+            font-weight: 900; 
+            box-shadow: 0 0 20px rgba(255, 0, 60, 0.6);
+            text-align: center;
+            line-height: 1.2;
+            animation: flash 1s infinite alternate;
+        }
+        
+        .p-bar { height: 32px; background: #000; border-radius: 16px; overflow: hidden; margin-bottom: 30px; position: relative; border: 1px solid rgba(255,255,255,0.05); }
+        .p-fill { 
+            height: 100%; 
+            width: 85.7%; 
+            background: linear-gradient(90deg, #f39c12 0%, #f1c40f 50%, #f39c12 100%);
+            background-size: 200% 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: rgba(0,0,0,0.6);
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: 1px;
+            animation: shimmer 2s infinite linear;
+            box-shadow: 0 0 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .avatar-group { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+        .avatar { 
+            width: 44px; 
+            height: 44px; 
+            border-radius: 50%; 
+            background: #222; 
+            border: 1.5px solid #444; 
+            overflow: hidden; 
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        
+        .avatar.empty { 
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px dashed #f1c40f; 
+            background: rgba(241, 196, 15, 0.05); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #f1c40f; 
+            font-size: 20px; 
+            font-weight: 900;
+            animation: pulse-border 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        @keyframes flash {
+            0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 20px rgba(255, 0, 60, 0.6); }
+            50% { opacity: 0.8; transform: scale(0.96); box-shadow: 0 0 10px rgba(255, 0, 60, 0.3); }
+        }
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.4); transform: scale(1); }
+            70% { box-shadow: 0 0 0 10px rgba(241, 196, 15, 0); transform: scale(1.05); }
+            100% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0); transform: scale(1); }
+        }
+
+        /* Fixed Footer Action */
+        .footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--secondary); border-top: 1px solid var(--border); padding: 16px 20px 35px; z-index: 1001; }
+        .invite-btn { width: 100%; background: var(--neon-red); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 900; font-size: 16px; margin-bottom: 12px; box-shadow: 0 10px 25px rgba(255, 0, 60, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .join-btn { width: 100%; background: white; color: black; border: none; padding: 18px; border-radius: 18px; font-weight: 900; font-size: 16px; cursor: pointer; }
+
+        /* Prerequisite Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+        .modal-card { background: var(--secondary); width: 100%; max-width: 320px; border-radius: 28px; padding: 35px 24px; text-align: center; position: relative; border: 1.5px solid var(--gold); }
+        .modal-icon { font-size: 52px; margin-bottom: 20px; }
+        .modal-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; margin-bottom: 12px; color: var(--gold); }
+        .modal-card p { font-size: 14px; color: #bbb; line-height: 1.6; margin-bottom: 25px; }
+        .modal-btn-join { width: 100%; background: var(--gold-gradient); color: black; border: none; padding: 16px; border-radius: 14px; font-weight: 900; font-size: 16px; margin-bottom: 12px; cursor: pointer; }
+        .modal-btn-close { font-size: 14px; color: #666; font-weight: 600; cursor: pointer; border: none; background: none; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Product In-Depth Info Section */
+        .details-container { background: var(--secondary); border-radius: 24px; padding: 25px; margin-top: 20px; border: 1px solid var(--border); }
+        .tabs { display: flex; gap: 30px; border-bottom: 1px solid var(--border); margin-bottom: 20px; padding-bottom: 10px; }
+        .tab { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #666; border: none; background: none; cursor: pointer; transition: 0.3s; }
+        .tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeInTabs 0.4s ease; }
+        
+        .spec-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+        .spec-label { color: #888; }
+        .spec-value { color: #eee; font-weight: 600; }
+        
+        .description-text { font-size: 14px; line-height: 1.8; color: #bbb; }
+        .description-text strong { color: #fff; }
+
+        .gallery-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; }
+        .gallery-img { aspect-ratio: 1/1; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+        .gallery-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+
+        @keyframes fadeInTabs { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="back-btn" onclick="history.back()">✕</button>
+        <span class="logo-text">PANDO ELITE</span>
+        <a href="accelerator.html" class="accel-link">⚡ ACCEL</a>
+    </header>
+
+    <div class="hero">
+        <div class="status-badge">🔥 LAST SEAT LEFT</div>
+        <div class="timer-badge">⏳ 02:45:12</div>
+        <img src="images/ps5.png" alt="Product Image">
+        <div class="compensation-tag">+$20</div>
+    </div>
+
+    <div class="content">
+        <div class="price-row">
+            <span class="current-price">$449</span>
+            <span class="original-price">$549</span>
+        </div>
+        <h1 class="product-title">PS5 Console Bundle - 2026 Elite Edition</h1>
+
+        <!-- OUTCOME GUARANTEE - Original Design Restored & Enhanced -->
+        <div class="outcome-card">
+            <div class="outcome-title">GUARANTEED OUTCOME</div>
+            
+            <div class="outcome-item">
+                <div class="outcome-icon">🏆</div>
+                <div class="outcome-text">
+                    <h4>WINNER: Get the Product at <strong>$449</strong></h4>
+                    <p>Owning the dream product at a <strong>-20% Discount</strong> instantly.</p>
+                </div>
+            </div>
+
+            <div class="outcome-item">
+                <div class="outcome-icon">💰</div>
+                <div class="outcome-text">
+                    <h4>PARTICIPANT: 100% Refund + <strong>$20 Subsidy</strong></h4>
+                    <p>No win? <strong>Get your Refund + Cash Reward</strong> instantly. Never lose!</p>
+                </div>
+            </div>
+
+            <div class="outcome-item">
+                <div class="outcome-icon">⏲️</div>
+                <div class="outcome-text">
+                    <h4>GROUP EXPIRY: <strong>24 Hours</strong></h4>
+                    <p>If not filled within 24h, you get an automatic <strong>100% Refund</strong>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- THE DETAILED WEALTH STIMULUS CARD -->
+        <div class="stimulus-card">
+            <div class="card-label">FIXED REWARD PER UNIT <span>LIVE</span></div>
+            <div class="unit-grid">
+                <div class="unit-box">
+                    <div class="u-label">Direct (L1)</div>
+                    <div class="u-val"><small>$</small>20.80</div>
+                </div>
+                <div class="unit-box">
+                    <div class="u-label">Indirect (L2)</div>
+                    <div class="u-val"><small>$</small>10.40</div>
+                </div>
+            </div>
+            
+            <div class="breakdown">
+                <div class="breakdown-row">
+                    <div class="b-label">Your Direct Invitations</div>
+                    <div class="b-val">3 Persons <span>(+$62.40)</span></div>
+                </div>
+                <div class="breakdown-row">
+                    <div class="b-label">Your Team's Referrals</div>
+                    <div class="b-val">2 Persons <span>(+$20.80)</span></div>
+                </div>
+                
+                <div class="total-lock-box">
+                    <h5>LOCKED REWARDS</h5>
+                    <div class="val">$83.20</div>
+                </div>
+            </div>
+            
+            <p style="font-size: 10px; color: var(--gold); margin-top: 15px; font-weight: 700; text-align: center;">
+                🚀 Invite 1 more to complete this group & earn +$20.80!
+            </p>
+        </div>
+
+        <div class="progress-box">
+            <div class="p-header">
+                <div class="p-title">GROUP CAPACITY (6 / 7 JOINED)</div>
+                <div class="p-urgency">ALMOST<br>FULL!</div>
+            </div>
+            <div class="p-bar">
+                <div class="p-fill">ALMOST FULL</div>
+            </div>
+            <div class="avatar-group">
+                <div class="avatar"><img src="https://i.pravatar.cc/100?u=a"></div>
+                <div class="avatar"><img src="https://i.pravatar.cc/100?u=b"></div>
+                <div class="avatar"><img src="https://i.pravatar.cc/100?u=c"></div>
+                <div class="avatar"><img src="https://i.pravatar.cc/100?u=d"></div>
+                <div class="avatar"><img src="https://i.pravatar.cc/100?u=e"></div>
+                <div class="avatar"><img src="https://i.pravatar.cc/100?u=f"></div>
+                <div class="avatar empty">?</div>
+            </div>
+        </div>
+
+        <!-- Detailed Product Info Section - RESTORED -->
+        <div class="details-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab(this, 'desc')">DETAILS</button>
+                <button class="tab" onclick="switchTab(this, 'specs')">SPECS</button>
+                <button class="tab" onclick="switchTab(this, 'shipping')">SHIPPING</button>
+            </div>
+            
+            <div id="desc" class="tab-content active">
+                <div class="description-text">
+                    <p>Experience the peak of performance. This premium selection is curated by <strong>Pando Elite</strong> to ensure only the highest quality reaches our members.</p>
+                    <br>
+                    <p>Our reverse group-buy model allows you to either walk away with this flagship device for a fraction of the cost or earn a guaranteed cash subsidy just for participating.</p>
+                </div>
+                <div class="gallery-preview">
+                    <div class="gallery-img"><img src="https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?q=80&w=400&auto=format&fit=crop"></div>
+                    <div class="gallery-img"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?q=80&w=400&auto=format&fit=crop"></div>
+                </div>
+            </div>
+
+            <div id="specs" class="tab-content">
+                <div class="spec-row"><span class="spec-label">Processor</span><span class="spec-value">A17 Pro Chip</span></div>
+                <div class="spec-row"><span class="spec-label">Display</span><span class="spec-value">6.7" Super Retina XDR</span></div>
+                <div class="spec-row"><span class="spec-label">Storage</span><span class="spec-value">256GB / 512GB / 1TB</span></div>
+                <div class="spec-row"><span class="spec-label">Camera</span><span class="spec-value">48MP Main | 5x Telephoto</span></div>
+                <div class="spec-row"><span class="spec-label">Weight</span><span class="spec-value">221g Titanium Build</span></div>
+            </div>
+
+            <div id="shipping" class="tab-content">
+                <div class="description-text">
+                    <p>📍 <strong>Local Delivery:</strong> 1-2 business days via J&T Express.</p>
+                    <p>🌍 <strong>Global Shipping:</strong> 7-10 business days via DHL/FedEx.</p>
+                    <br>
+                    <p>All items are insured during transit. Once a group is completed and the winner is drawn, tracking numbers are provided within 12 hours.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <button class="invite-btn" onclick="showShareDialog()">
+            <span>🚀 INVITE & EARN $20.80</span>
+        </button>
+        <button class="join-btn" onclick="window.location.href='checkout.html'">
+            JOIN THIS GROUP ($449)
+        </button>
+    </div>
+
+    <!-- Prerequisite Modal -->
+    <div class="modal-overlay" id="prereqModal">
+        <div class="modal-card">
+            <div class="modal-icon">🔐</div>
+            <h3>ACTION REQUIRED</h3>
+            <p>To start earning referral commissions and invite friends, you must <strong>Join the Group</strong> first. <br><br>Secure your seat now to unlock your unique referral link!</p>
+            <button class="modal-btn-join" onclick="window.location.href='checkout.html'">JOIN NOW & UNLOCK</button>
+            <button class="modal-btn-close" onclick="closeModal()">Maybe Later</button>
+        </div>
+    </div>
+
+    <script>
+        let hasJoined = false; 
+
+        function showShareDialog() {
+            if (!hasJoined) {
+                document.getElementById('prereqModal').classList.add('active');
+            } else {
+                alert('Share link copied! Invite 1 friend to complete the group.');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('prereqModal').classList.remove('active');
+        }
+
+        document.getElementById('prereqModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        function switchTab(btn, contentId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(contentId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
